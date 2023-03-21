@@ -355,6 +355,12 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             if batch[2] == 1:
                 # if over the limits, cut the number in half and let AIYA scale down
                 total = max_batch[0] * max_batch[1]
+                # add hard limit of 10 images until I can figure how to bypass this discord limit - single value edition
+                if batch[0] > 10:
+                    batch[0] = 10
+                    if total > 10:
+                        total = 10
+                    reply_adds += f"\nI'm currently limited to a max of 10 drawings per post..."
                 if batch[0] > total:
                     batch[0] = math.ceil(batch[0] / 2)
                     batch[1] = math.ceil(batch[0] / 2)
@@ -374,6 +380,14 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             if batch[1] > max_batch[1]:
                 reply_adds += f"\nThe max batch size I'm allowed here is ``{max_batch[1]}``!"
                 batch[1] = max_batch[1]
+                # add hard limit of 10 images until I can figure how to bypass this discord limit - multi value edition
+                if batch[0] * batch[1] > 10:
+                    while batch[0] * batch[1] > 10:
+                        if batch[0] != 1:
+                            batch[0] -= 1
+                        if batch[1] != 1:
+                            batch[1] -= 1
+                    reply_adds += f"\nI'm currently limited to a max of 10 drawings per post..."
             reply_adds += f'\nBatch count: ``{batch[0]}`` - Batch size: ``{batch[1]}``'
         if styles != settings.read(channel)['style']:
             reply_adds += f'\nStyle: ``{styles}``'
@@ -415,7 +429,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         event_loop.create_task(
             post_queue_object.ctx.channel.send(
                 content=post_queue_object.content,
-                file=post_queue_object.file,
+                files=post_queue_object.files,
                 view=post_queue_object.view
             )
         )
@@ -523,56 +537,14 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             epoch_time = queue_object.epoch_time
 
             # save local copy of image and prepare PIL images
-            image_data = response_data['images']
-            count = 0
-            image_count = len(image_data)
-            batch = False
-
-            # setup batch params
-            if queue_object.batch[0] > 1 or queue_object.batch[1] > 1:
-                batch = True
-                grids = []
-                images = []
-                aspect_ratio = queue_object.width / queue_object.height
-                num_grids = math.ceil(image_count / 25)
-                grid_count = 25 if num_grids > 1 else image_count
-                last_grid_count = image_count % 25
-                if num_grids > 1 and image_count % 25 == 0:
-                    last_grid_count = 25
-
-                if aspect_ratio <= 1:
-                    grid_cols = int(math.ceil(math.sqrt(grid_count)))
-                    grid_rows = math.ceil(grid_count / grid_cols)
-                    if last_grid_count > 0:
-                        last_grid_cols = int(math.ceil(math.sqrt(last_grid_count)))
-                        last_grid_rows = math.ceil(last_grid_count / last_grid_cols)
-                else:
-                    grid_rows = int(math.ceil(math.sqrt(grid_count)))
-                    grid_cols = math.ceil(grid_count / grid_rows)
-                    if last_grid_count > 0:
-                        last_grid_rows = int(math.ceil(math.sqrt(last_grid_count)))
-                        last_grid_cols = math.ceil(last_grid_count / last_grid_rows)
-
-                for i in range(num_grids):
-                    if i == num_grids:
-                        continue
-                    
-                    if i < num_grids - 1 or last_grid_count == 0:
-                        width = grid_cols * queue_object.width
-                        height = grid_rows * queue_object.height
-                    else: 
-                        width = last_grid_cols * queue_object.width
-                        height = last_grid_rows * queue_object.height
-                    image = Image.new('RGB', (width, height))
-                    grids.append(image)
-
-            for i in image_data:
-                count += 1
-                image = Image.open(io.BytesIO(base64.b64decode(i)))
+            pil_images = []
+            for i, image_base64 in enumerate(response_data['images']):
+                image = Image.open(io.BytesIO(base64.b64decode(image_base64.split(",", 1)[0])))
+                pil_images.append(image)
 
                 # grab png info
                 png_payload = {
-                    "image": "data:image/png;base64," + i
+                    "image": "data:image/png;base64," + image_base64
                 }
                 png_response = s.post(url=f'{settings.global_var.url}/sdapi/v1/png-info', json=png_payload)
 
@@ -580,25 +552,35 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                 metadata.add_text("parameters", png_response.json().get("info"))
                 str_parameters = png_response.json().get("info")
 
-                file_path = f'{settings.global_var.dir}/{epoch_time}-{queue_object.seed}-{count}.png'
-
-                # if we are using a batch we need to save the files to disk
-                if settings.global_var.save_outputs == 'True' or batch == True:
+                epoch_time = int(time.time())
+                file_path = f'{settings.global_var.dir}/{epoch_time}-{queue_object.seed}-{file_name[0:120]}-{i}.png'
+                if settings.global_var.save_outputs == 'True':
                     image.save(file_path, pnginfo=metadata)
                     print(f'Saved image: {file_path}')
 
-                if batch == True:
-                    image_data = (image, file_path, str_parameters)
-                    images.append(image_data)
-                    
-                settings.stats_count(1)
+                settings.stats_count(queue_object.batch[0]*queue_object.batch[1])
 
-                # increment seed for view when using batch
-                if count != len(image_data):
-                    batch_seed = list(queue_object.view.input_tuple)
-                    batch_seed[10] += 1
-                    new_tuple = tuple(batch_seed)
-                    queue_object.view.input_tuple = new_tuple
+                # set up discord message
+                image_count = len(pil_images)
+                noun_descriptor = "drawing" if image_count == 1 else f'{image_count} drawings'
+                draw_time = '{0:.3f}'.format(end_time - start_time)
+                message = f'my {noun_descriptor} of ``{queue_object.simple_prompt}`` took me ``{draw_time}`` seconds!'
+
+            view = queue_object.view
+            # post to discord
+            with contextlib.ExitStack() as stack:
+                buffer_handles = [stack.enter_context(io.BytesIO()) for _ in pil_images]
+
+                for (pil_image, buffer) in zip(pil_images, buffer_handles):
+                    pil_image.save(buffer, 'PNG', pnginfo=metadata)
+                    buffer.seek(0)
+
+                files = [discord.File(fp=buffer, filename=f'{queue_object.seed}-{i}.png') for (i, buffer) in
+                         enumerate(buffer_handles)]
+                queuehandler.process_post(
+                    self, queuehandler.PostObject(
+                        self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>, {message}', file='',
+                        files=files, embed='', view=view))
 
             # set up discord message
             def post_dream():
