@@ -45,7 +45,7 @@ batch_buttons = "False"
 restrict_buttons = "True"
 
 # The maximum value allowed for width/height (keep as multiple of 32)
-max_size = 1024
+max_size = 1280
 
 # The resize amount when using context menu Quick Upscale
 quick_upscale_resize = 2.0
