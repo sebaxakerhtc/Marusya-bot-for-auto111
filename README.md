@@ -1,14 +1,16 @@
-# AIYA
+# Маруся
 
-A Discord bot interface for Stable Diffusion
+Discord бот для Stable Diffusion
 
-<img src=https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/preview.png  width=50% height=50%>
+<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=30% height=30%>
+
+This fork is for me and my friends. Original project [here](https://github.com/Kilvoctu/aiyabot)!
 
 ## Usage
 
 To generate an image from text, use the /draw command and include your prompt as the query.
 
-<img src=https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/preview2.png>
+<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/screenshot.png width=50% height=50%>
 
 ### Currently supported options
 
