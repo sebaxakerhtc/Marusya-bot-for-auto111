@@ -36,10 +36,10 @@ save_outputs = "True"
 dir = "outputs"
 
 # The limit of tasks a user can have waiting in queue (at least 1)
-queue_limit = 1
+queue_limit = 5
 
 # Whether or not buttons keep generating in batches ("True"/"False")
-batch_buttons = "False"
+batch_buttons = "True"
 
 # Whether or not buttons are restricted to user who requested image ("True"/"False")
 restrict_buttons = "True"
@@ -65,11 +65,11 @@ negative_prompt_prefix = []
 negative_prompt = ""
 data_model = ""
 steps = 30
-max_steps = 50
-width = 512
-height = 512
+max_steps = 80
+width = 640
+height = 640
 guidance_scale = "7.0"
-sampler = "Euler a"
+sampler = "DPM++ 2M Karras"
 style = "None"
 facefix = "None"
 highres_fix = "Disabled"
@@ -79,8 +79,8 @@ hyper_multi = "0.85"
 lora = "None"
 lora_multi = "0.85"
 strength = "0.75"
-batch = "1,1"
-max_batch = "1,1"
+batch = "1,4"
+max_batch = "5,5"
 upscaler_1 = "ESRGAN_4x"
 """
 
@@ -112,8 +112,8 @@ class GlobalVar:
     upscaler_names = []
     hires_upscaler_names = []
     save_outputs = "True"
-    queue_limit = 1
-    batch_buttons = "False"
+    queue_limit = 5
+    batch_buttons = "True"
     restrict_buttons = "True"
     quick_upscale_resize = 2.0
     prompt_ban_list = []
