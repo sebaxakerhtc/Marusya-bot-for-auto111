@@ -22,30 +22,30 @@ class IdentifyCog(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(viewhandler.DeleteView(self))
 
-    @commands.slash_command(name='identify', description='Describe an image', guild_only=True)
+    @commands.slash_command(name='identify', description='Описание изображения', guild_only=True)
     @option(
         'init_image',
         discord.Attachment,
-        description='The image to identify.',
+        description='Изображение для идентификации.',
         required=False,
     )
     @option(
         'init_url',
         str,
-        description='The URL image to identify. This overrides init_image!',
+        description='URL зображения для идентификации. Эта опция отменяет init_image!',
         required=False,
     )
     @option(
         'phrasing',
         str,
-        description='The way the image will be described.',
+        description='Каким образом будет описано изображение.',
         required=False,
-        choices=['Normal', 'Tags', 'Image Info']
+        choices=['Описание', 'Теги', 'Инормация из изображения']
     )
     async def dream_handler(self, ctx: discord.ApplicationContext, *,
                             init_image: Optional[discord.Attachment] = None,
                             init_url: Optional[str],
-                            phrasing: Optional[str] = 'Normal'):
+                            phrasing: Optional[str] = 'Описание'):
 
         has_image = True
         # url *will* override init image for compatibility, can be changed here
@@ -53,19 +53,19 @@ class IdentifyCog(commands.Cog):
             try:
                 init_image = requests.get(init_url)
             except(Exception,):
-                await ctx.send_response('URL image not found!\nI have nothing to work with...', ephemeral=True)
+                await ctx.send_response('URL изображения не найден!\nМне не с чем работать...', ephemeral=True)
                 has_image = False
 
         # fail if no image is provided
         if init_url is None:
             if init_image is None:
-                await ctx.send_response('I need an image to identify!', ephemeral=True)
+                await ctx.send_response('Мне нужно изображение для идентификации!', ephemeral=True)
                 has_image = False
 
         # Update layman-friendly "phrasing" choices into what API understands
-        if phrasing == 'Normal':
+        if phrasing == 'Описание':
             phrasing = 'clip'
-        elif phrasing == 'Tags':
+        elif phrasing == 'Теги':
             phrasing = 'deepdanbooru'
         else:
             await ctxmenuhandler.parse_image_info(ctx, init_image.url, "slash")
@@ -79,13 +79,13 @@ class IdentifyCog(commands.Cog):
         if has_image:
             if queuehandler.GlobalQueue.dream_thread.is_alive():
                 if user_queue_limit == "Stop":
-                    await ctx.send_response(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                    await ctx.send_response(content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.", ephemeral=True)
                 else:
                     queuehandler.GlobalQueue.queue.append(queuehandler.IdentifyObject(self, *input_tuple, view))
             else:
                 await queuehandler.process_dream(self, queuehandler.IdentifyObject(self, *input_tuple, view))
             if user_queue_limit != "Stop":
-                await ctx.send_response(f"<@{ctx.author.id}>, I'm identifying the image!\nQueue: ``{len(queuehandler.GlobalQueue.queue)}``", delete_after=45.0)
+                await ctx.send_response(f"<@{ctx.author.id}>, Я идентифицирую изображение!\nЗапрос: ``{len(queuehandler.GlobalQueue.queue)}``", delete_after=45.0)
 
     # the function to queue Discord posts
     def post(self, event_loop: AbstractEventLoop, post_queue_object: queuehandler.PostObject):
@@ -116,7 +116,7 @@ class IdentifyCog(commands.Cog):
             # post to discord
             def post_dream():
                 caption = response_data.get('caption')
-                embed_title = 'I think this is'
+                embed_title = 'Я думаю, это'
                 if len(caption) > 4096:
                     caption = caption[:4096]
 

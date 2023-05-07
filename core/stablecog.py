@@ -28,17 +28,17 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
     async def on_ready(self):
         self.bot.add_view(viewhandler.DrawView(self))
 
-    @commands.slash_command(name='draw', description='Create an image', guild_only=True)
+    @commands.slash_command(name='draw', description='Создание изображений', guild_only=True)
     @option(
         'prompt',
         str,
-        description='A prompt to condition the model with.',
+        description='Описание того, что мы хотим увидеть.',
         required=True,
     )
     @option(
         'negative_prompt',
         str,
-        description='Negative prompts to exclude from output.',
+        description='Описание того, чего нам не хотелось бы видеть.',
         required=False,
     )
     @option(
@@ -228,9 +228,9 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         prompt = settings.extra_net_defaults(prompt, channel)
 
         if data_model != '':
-            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt}')
+            print(f'Запрос -- {ctx.author.name}#{ctx.author.discriminator} -- Описание: {prompt}')
         else:
-            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt} -- Using model: {data_model}')
+            print(f'Запрос -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt} -- Используемая модель: {data_model}')
 
         if seed == -1:
             seed = random.randint(0, 0xFFFFFFFF)
@@ -240,20 +240,20 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             try:
                 init_image = requests.get(init_url)
             except(Exception,):
-                await ctx.send_response('URL image not found!\nI will do my best without it!')
+                await ctx.send_response('URL изображение не найдено!\nЯ постараюсь без него!')
 
         # verify values and format aiya initial reply
         reply_adds = ''
         if (width != 512) or (height != 512):
-            reply_adds += f' - Size: ``{width}``x``{height}``'
+            reply_adds += f' - Разрешение: ``{width}``x``{height}``'
         reply_adds += f' - Seed: ``{seed}``'
 
         # lower step value to the highest setting if user goes over max steps
         if steps > settings.read(channel)['max_steps']:
             steps = settings.read(channel)['max_steps']
-            reply_adds += f'\nExceeded maximum of ``{steps}`` steps! This is the best I can do...'
+            reply_adds += f'\nДостигнут максимум ``{steps}`` шагов! Это лучшее, что я могу сделать...'
         if model_name != 'Default':
-            reply_adds += f'\nModel: ``{model_name}``'
+            reply_adds += f'\nМодель: ``{model_name}``'
         if clean_negative != settings.read(channel)['negative_prompt']:
             reply_adds += f'\nNegative Prompt: ``{clean_negative}``'
         if guidance_scale != settings.read(channel)['guidance_scale']:
@@ -266,7 +266,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                 reply_adds += f"\nGuidance Scale can't be ``{guidance_scale}``! Setting to default of `7.0`."
                 guidance_scale = 7.0
         if sampler != settings.read(channel)['sampler']:
-            reply_adds += f'\nSampler: ``{sampler}``'
+            reply_adds += f'\nСэмплер: ``{sampler}``'
         if init_image:
             # try to convert string to Web UI-friendly float
             try:
@@ -276,7 +276,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             except(Exception,):
                 reply_adds += f"\nStrength can't be ``{strength}``! Setting to default of `0.75`."
                 strength = 0.75
-            reply_adds += f'\nURL Init Image: ``{init_image.url}``'
+            reply_adds += f'\nURL входного изображения: ``{init_image.url}``'
         # try to convert batch to usable format
         batch_check = settings.batch_format(batch)
         batch = list(batch_check)
@@ -291,7 +291,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                     batch[0] = 10
                     if total > 10:
                         total = 10
-                    reply_adds += f"\nI'm currently limited to a max of 10 drawings per post..."
+                    reply_adds += f"\nЯ ограничена до 10 произведений искусства в 1 сообщении..."
                 if batch[0] > total:
                     batch[0] = math.ceil(batch[0] / 2)
                     batch[1] = math.ceil(batch[0] / 2)
@@ -303,7 +303,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                     requested = batch[0]
                     batch[0], batch[1] = difference, multiple
                     if requested % difference != 0:
-                        reply_adds += f"\nI can't draw exactly ``{requested}`` pictures! Settling for ``{new_total}``."
+                        reply_adds += f"\nЯ не могу создать столько изображений: ``{requested}``! Зато ``{new_total}`` смогу."
             # check batch values against the maximum limits
             if batch[0] > max_batch[0]:
                 reply_adds += f"\nThe max batch count I'm allowed here is ``{max_batch[0]}``!"
@@ -318,7 +318,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                             batch[0] -= 1
                         if batch[1] != 1:
                             batch[1] -= 1
-                    reply_adds += f"\nI'm currently limited to a max of 10 drawings per post..."
+                    reply_adds += f"\nЯ ограничена до 10 произведений искусства в 1 сообщении..."
             reply_adds += f'\nBatch count: ``{batch[0]}`` - Batch size: ``{batch[1]}``'
         if styles != settings.read(channel)['style']:
             reply_adds += f'\nStyle: ``{styles}``'
@@ -340,13 +340,13 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         user_queue_limit = settings.queue_check(ctx.author)
         if queuehandler.GlobalQueue.dream_thread.is_alive():
             if user_queue_limit == "Stop":
-                await ctx.send_response(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                await ctx.send_response(content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.", ephemeral=True)
             else:
                 queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(self, *input_tuple, view))
         else:
             await queuehandler.process_dream(self, queuehandler.DrawObject(self, *input_tuple, view))
         if user_queue_limit != "Stop":
-            await ctx.send_response(f'<@{ctx.author.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}`` - ``{simple_prompt}``\nSteps: ``{steps}``{reply_adds}')
+            await ctx.send_response(f'<@{ctx.author.id}>, {settings.messages()}\nЗапрос: ``{len(queuehandler.GlobalQueue.queue)}`` - ``{simple_prompt}``\nШаги: ``{steps}``{reply_adds}')
 
     # the function to queue Discord posts
     def post(self, event_loop: queuehandler.GlobalQueue.post_event_loop, post_queue_object: queuehandler.PostObject):
@@ -467,9 +467,9 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
                 # set up discord message
                 image_count = len(pil_images)
-                noun_descriptor = "drawing" if image_count == 1 else f'{image_count} drawings'
+                noun_descriptor = "произвадения искусства" if image_count == 1 else f' произведений искусства: {image_count}'
                 draw_time = '{0:.3f}'.format(end_time - start_time)
-                message = f'my {noun_descriptor} of ``{queue_object.simple_prompt}`` took me ``{draw_time}`` seconds!'
+                message = f'создание {noun_descriptor} с описанием ``{queue_object.simple_prompt}`` заняло в секундах: ``{draw_time}``!'
 
             view = queue_object.view
             # post to discord

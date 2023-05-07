@@ -200,9 +200,9 @@ async def parse_image_info(ctx, image_url, command):
     except Exception as e:
         print('The image info command broke: ' + str(e))
         if command == 'slash':
-            message = "\nIf you're copying from Discord and think there should be image info," \
-                      " try **Copy Link** instead of **Copy Image**"
-        await ctx.respond(content=f"The image information is empty or unreadable!{message}", ephemeral=True)
+            message = "\nЕсли выкопируете из Discord и думаете, что там должна быть информация," \
+                      " попробуйте **Копировать ссылку** вместо **Копировать изображение**"
+        await ctx.respond(content=f"Инормация из изображения отсутствует или нечитаема!{message}", ephemeral=True)
 
 
 async def get_image_info(ctx, message: discord.Message):
@@ -215,7 +215,7 @@ async def get_image_info(ctx, message: discord.Message):
     urls = extractor.find_urls(all_content)
 
     if not urls:
-        await ctx.respond(content="No images were found in the message...", ephemeral=True)
+        await ctx.respond(content="В сообщении не найдено изображений...", ephemeral=True)
         return
 
     for image_url in urls:
@@ -232,7 +232,7 @@ async def quick_upscale(self, ctx, message: discord.Message):
     urls = extractor.find_urls(all_content)
 
     if not urls:
-        await ctx.respond(content="No images were found in the message...", ephemeral=True)
+        await ctx.respond(content="В сообщении не найдено изображений...", ephemeral=True)
         return
 
     # update defaults with any new defaults from settingscog
@@ -242,7 +242,7 @@ async def quick_upscale(self, ctx, message: discord.Message):
 
     init_image = requests.get(urls[0])
     resize = settings.global_var.quick_upscale_resize
-    upscaler_2, upscaler_2_strength = "None", '0.5'
+    upscaler_2, upscaler_2_strength = "None", '0.35'
     gfpgan, codeformer = '0.0', '0.0'
     upscale_first = False
 
@@ -259,7 +259,7 @@ async def quick_upscale(self, ctx, message: discord.Message):
     if queuehandler.GlobalQueue.dream_thread.is_alive():
         if user_queue_limit == "Stop":
             await ctx.send_response(
-                content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.",
+                content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.",
                 ephemeral=True)
         else:
             queuehandler.GlobalQueue.queue.append(queuehandler.UpscaleObject(upscale_dream, *input_tuple, view))
@@ -267,5 +267,5 @@ async def quick_upscale(self, ctx, message: discord.Message):
         await queuehandler.process_dream(upscale_dream, queuehandler.UpscaleObject(upscale_dream, *input_tuple, view))
     if user_queue_limit != "Stop":
         await ctx.send_response(
-            f'<@{ctx.author.id}>, upscaling {message}by ``{resize}``x using ``{upscaler_1}``!\n'
-            f'Queue: ``{len(queuehandler.GlobalQueue.queue)}``', delete_after=45.0)
+            f'<@{ctx.author.id}>, увеличение изображения {message}Шкала ``{resize}``x Модель: ``{upscaler_1}``!\n'
+            f'Запрос: ``{len(queuehandler.GlobalQueue.queue)}``', delete_after=45.0)

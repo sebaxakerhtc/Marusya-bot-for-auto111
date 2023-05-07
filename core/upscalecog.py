@@ -29,61 +29,61 @@ class UpscaleCog(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(viewhandler.DeleteView(self))
 
-    @commands.slash_command(name='upscale', description='Upscale an image', guild_only=True)
+    @commands.slash_command(name='upscale', description='Увеличение изображения', guild_only=True)
     @option(
         'init_image',
         discord.Attachment,
-        description='The starter image to upscale',
+        description='Вводное изображение',
         required=False,
     )
     @option(
         'init_url',
         str,
-        description='The starter URL image to upscale. This overrides init_image!',
+        description='URL вводного изображения. Эта опция отменяет init_image!',
         required=False,
     )
     @option(
         'resize',
         str,
-        description='The amount to upscale the image by (1.0 to 4.0).',
+        description='Кратность увеличения (от 1.0 до 4.0).',
         required=True
     )
     @option(
         'upscaler_1',
         str,
-        description='The upscaler model to use.',
+        description='Модель увеличения.',
         required=True,
         autocomplete=discord.utils.basic_autocomplete(settingscog.SettingsCog.upscaler_autocomplete),
     )
     @option(
         'upscaler_2',
         str,
-        description='The 2nd upscaler model to use.',
+        description='2ая модель увеличения.',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(settingscog.SettingsCog.upscaler_autocomplete),
     )
     @option(
         'upscaler_2_strength',
         str,
-        description='The visibility of the 2nd upscaler model. (0.0 to 1.0)',
+        description='Видимость 2ой модели увеличения. (от 0.0 до 1.0)',
         required=False,
     )
     @option(
         'gfpgan',
         str,
-        description='The visibility of the GFPGAN face restoration model. (0.0 to 1.0)',
+        description='Видимость модели восстановления лиц GFPGAN. (от 0.0 до 1.0)',
         required=False,
     )
     @option(
         'codeformer',
         str,
-        description='The visibility of the codeformer face restoration model. (0.0 to 1.0)',
+        description='Видимость модели восстановления лиц codeformer. (от 0.0 до 1.0)',
         required=False,
     )
     @option(
         'upscale_first',
         bool,
-        description='Do the upscale before restoring faces. Default: False',
+        description='Увеличить изображение до восстановления лиц. По умолчанию: False',
         required=False,
     )
     async def dream_handler(self, ctx: discord.ApplicationContext, *,
@@ -92,7 +92,7 @@ class UpscaleCog(commands.Cog):
                             resize: str = '2.0',
                             upscaler_1: str = None,
                             upscaler_2: Optional[str] = "None",
-                            upscaler_2_strength: Optional[str] = '0.5',
+                            upscaler_2_strength: Optional[str] = '0.35',
                             gfpgan: Optional[str] = '0.0',
                             codeformer: Optional[str] = '0.0',
                             upscale_first: Optional[bool] = False):
@@ -109,13 +109,13 @@ class UpscaleCog(commands.Cog):
             try:
                 init_image = requests.get(init_url)
             except(Exception,):
-                await ctx.send_response('URL image not found!\nI have nothing to work with...', ephemeral=True)
+                await ctx.send_response('URL изображения не найден!\nМне не с чем работать...', ephemeral=True)
                 has_image = False
 
         # fail if no image is provided
         if init_url is None:
             if init_image is None:
-                await ctx.send_response('I need an image to upscale!', ephemeral=True)
+                await ctx.send_response('Мне нужно изображение для увеличения!', ephemeral=True)
                 has_image = False
 
         # pull the name from the image
@@ -132,10 +132,10 @@ class UpscaleCog(commands.Cog):
         # check if resize is within limits
         if float(resize) < 1.0:
             resize = 1.0
-            reply_adds += f"\nResize can't go below 1.0x! Setting it to ``{resize}``."
+            reply_adds += f"\nУвеличение не может быть менее 1.0x! Устанавливаю ``{resize}``."
         if float(resize) > 4.0:
             resize = 4.0
-            reply_adds += f"\nResize can't go above 4.0x! Setting it to ``{resize}``."
+            reply_adds += f"\nУвеличение не может быть менее 4.0x! Устанавливаю ``{resize}``."
 
         # set up tuple of parameters
         input_tuple = (ctx, resize, init_image, upscaler_1, upscaler_2, upscaler_2_strength, gfpgan, codeformer, upscale_first)
@@ -145,13 +145,13 @@ class UpscaleCog(commands.Cog):
         if has_image:
             if queuehandler.GlobalQueue.dream_thread.is_alive():
                 if user_queue_limit == "Stop":
-                    await ctx.send_response(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                    await ctx.send_response(content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.", ephemeral=True)
                 else:
                     queuehandler.GlobalQueue.queue.append(queuehandler.UpscaleObject(self, *input_tuple, view))
             else:
                 await queuehandler.process_dream(self, queuehandler.UpscaleObject(self, *input_tuple, view))
             if user_queue_limit != "Stop":
-                await ctx.send_response(f'<@{ctx.author.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}`` - Scale: ``{resize}``x - Upscaler: ``{upscaler_1}``{reply_adds}')
+                await ctx.send_response(f'<@{ctx.author.id}>, {settings.messages()}\nЗапрос: ``{len(queuehandler.GlobalQueue.queue)}`` - Шкала: ``{resize}``x - Модель: ``{upscaler_1}``{reply_adds}')
 
     # the function to queue Discord posts
     def post(self, event_loop: AbstractEventLoop, post_queue_object: queuehandler.PostObject):
@@ -203,7 +203,7 @@ class UpscaleCog(commands.Cog):
             if settings.global_var.save_outputs == 'True':
                 with open(file_path, "wb") as fh:
                     fh.write(base64.b64decode(image_data))
-                print(f'Saved image: {file_path}')
+                print(f'Изображение сохранено: {file_path}')
 
             # post to discord
             def post_dream():
@@ -213,7 +213,7 @@ class UpscaleCog(commands.Cog):
                     buffer.seek(0)
 
                     draw_time = '{0:.3f}'.format(end_time - start_time)
-                    message = f'my upscale of ``{queue_object.resize}``x took me ``{draw_time}`` seconds!'
+                    message = f'увеличение изображения ``{queue_object.resize}``x заняло в секундах: ``{draw_time}``!'
                     file = discord.File(fp=buffer, filename=f'{self.file_name[0:120]}-{queue_object.resize}.png')
 
                     queuehandler.process_post(

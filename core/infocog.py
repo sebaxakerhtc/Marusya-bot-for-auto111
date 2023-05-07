@@ -239,17 +239,17 @@ class InfoView(View):
 
     @discord.ui.button(
         custom_id="button_tips",
-        label="Documentation", row=1)
+        label="Документация", row=1)
     async def button_tips(self, _button, interaction):
         self.enable_nav_buttons()
         self.page = 0
 
-        embed_tips1 = discord.Embed(title="Documentation", description="Welcome to the documentation! Basic usage and prompting tips is explained here.",
+        embed_tips1 = discord.Embed(title="Documentation", description="Добро пожаловать в документацию! Здесь объяснаются основы использования и запросов.",
                                     colour=settings.global_var.embed_color)
-        embed_tips1.add_field(name="/draw command", value="Simply fill in the prompt and hit send!"
-                                                          "\nThere are many additional options, but they are automatically set filled with presets. They aren't required unless you want to tweak your prompts.")
-        embed_tips1.add_field(name="image-to-image", value="Use the /draw command for this, **init_img** option for an attachment or **init_url** for a link."
-                                                           "\nNote that **strength** interacts with img2img. The range is 0.0 to 1.0, with higher values having more effect on the image.")
+        embed_tips1.add_field(name="txt2img", value="Текст в изображение. Используйте команду /draw. Просто опишите, что хотите получить и отправьте запрос!"
+                                                          "\nЕсть множество дополнительных опций, но они автоматически устанавливаются согласно предустановок. Они необязательны, но помогают улучшить результат.")
+        embed_tips1.add_field(name="img2img", value="Изображение в изображение. Используйте команду /draw, опция **init_img** позволяет загрузить изображение с устройства, а **init_url** использовать ссылку на изображение."
+                                                           "\nПомните что **strength** взаимодействует с img2img. Значения от 0.0 до 1.0, большее значение больше воздействует на изображение.")
         embed_tips1.add_field(name="\u200B", value="\u200B")
         embed_tips1.add_field(name="/identify command", value="This command makes a caption for your image. A standard caption is generated with normal **phrasing**, or tags can be used to generate a list of keywords.")
         embed_tips1.add_field(name="/upscale command", value="A simple command to upscale your image! You can upscale up to 4x at a time.")

@@ -358,7 +358,7 @@ class DrawView(View):
                     await interaction.response.send_message(
                         f'<@{interaction.user.id}>, {settings.messages()}\nQueue: '
                         f'``{len(queuehandler.GlobalQueue.queue)}`` - ``{seed_tuple[1]}``'
-                        f'\nNew Seed:``{seed_tuple[10]}``')
+                        f'\nНовый Seed:``{seed_tuple[10]}``')
             else:
                 await interaction.response.send_message("You can't use other people's 🎲!", ephemeral=True)
         except Exception as e:
@@ -366,7 +366,7 @@ class DrawView(View):
             # if interaction fails, assume it's because aiya restarted (breaks buttons)
             button.disabled = True
             await interaction.response.edit_message(view=self)
-            await interaction.followup.send("I may have been restarted. This button no longer works.", ephemeral=True)
+            await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.", ephemeral=True)
 
     # the 📋 button will let you review the parameters of the generation
     @discord.ui.button(
@@ -386,8 +386,8 @@ class DrawView(View):
             # if interaction fails, assume it's because aiya restarted (breaks buttons)
             button.disabled = True
             await interaction.response.edit_message(view=self)
-            await interaction.followup.send("I may have been restarted. This button no longer works.\n"
-                                            "You can get the image info from the context menu or **/identify**.",
+            await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.\n"
+                                            "Вы можете получить информацию об изображении в контекстном меню или через **/identify**.",
                                             ephemeral=True)
 
     # the button to delete generated images
@@ -404,8 +404,8 @@ class DrawView(View):
         except(Exception,):
             button.disabled = True
             await interaction.response.edit_message(view=self)
-            await interaction.followup.send("I may have been restarted. This button no longer works.\n"
-                                            "You can react with ❌ to delete the image.", ephemeral=True)
+            await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.\n"
+                                            "Вы можете использовать ❌ для удаления изображений.", ephemeral=True)
 
 
 class DeleteView(View):
@@ -426,5 +426,5 @@ class DeleteView(View):
         except(Exception,):
             button.disabled = True
             await interaction.response.edit_message(view=self)
-            await interaction.followup.send("I may have been restarted. This button no longer works.\n"
-                                            "You can react with ❌ to delete the image.", ephemeral=True)
+            await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.\n"
+                                            "Вы можете использовать ❌ для удаления изображений.", ephemeral=True)
