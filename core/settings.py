@@ -36,13 +36,13 @@ save_outputs = "True"
 dir = "outputs"
 
 # The limit of tasks a user can have waiting in queue (at least 1)
-queue_limit = 1
+queue_limit = 5
 
 # Whether or not buttons keep generating in batches ("True"/"False")
-batch_buttons = "False"
+batch_buttons = "True"
 
 # The maximum value allowed for width/height (keep as multiple of 64)
-max_size = 1024
+max_size = 1280
 
 # The resize amount when using context menu Quick Upscale
 quick_upscale_resize = 2.0
@@ -62,11 +62,11 @@ negative_prompt_prefix = []
 negative_prompt = ""
 data_model = ""
 steps = 30
-max_steps = 50
-width = 512
-height = 512
+max_steps = 80
+width = 640
+height = 640
 guidance_scale = "7.0"
-sampler = "Euler a"
+sampler = "DPM++ 2M Karras"
 style = "None"
 facefix = "None"
 highres_fix = "Disabled"
@@ -76,8 +76,8 @@ hyper_multi = "0.85"
 lora = "None"
 lora_multi = "0.85"
 strength = "0.75"
-batch = "1,1"
-max_batch = "1,1"
+batch = "1,4"
+max_batch = "5,5"
 upscaler_1 = "ESRGAN_4x"
 """
 
@@ -96,7 +96,7 @@ class GlobalVar:
     api_user: Optional[str] = None
     api_pass: Optional[str] = None
     model_info = {}
-    size_range = range(192, 1088, 64)
+    size_range = range(512, 1312, 32)
     sampler_names = []
     style_names = {}
     facefix_models = []
@@ -108,8 +108,8 @@ class GlobalVar:
     upscaler_names = []
     hires_upscaler_names = []
     save_outputs = "True"
-    queue_limit = 1
-    batch_buttons = "False"
+    queue_limit = 5
+    batch_buttons = "True"
     quick_upscale_resize = 2.0
     prompt_ban_list = []
     prompt_ignore_list = []
@@ -487,7 +487,7 @@ def populate_global_vars():
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
     # slash command doesn't update this dynamically. Changes to size need a restart.
-    global_var.size_range = range(192, config['max_size'] + 64, 64)
+    global_var.size_range = range(512, config['max_size'] + 32, 32)
 
     # create persistent session since we'll need to do a few API calls
     s = authenticate_user()
