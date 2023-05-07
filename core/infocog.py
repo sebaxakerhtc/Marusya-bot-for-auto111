@@ -49,7 +49,7 @@ class InfoView(View):
         # create each page and place into "contents" list
         for i in range(0, length, batch):
             model_list = ''
-            embed_page = discord.Embed(title="Models list", colour=settings.global_var.embed_color)
+            embed_page = discord.Embed(title="Список моделей", colour=settings.global_var.embed_color)
             for key in models[i:i + batch]:
                 for keyB, value in settings.global_var.model_info.items():
                     if key == keyB:
@@ -59,7 +59,7 @@ class InfoView(View):
                         break
             embed_page.add_field(name="", value=model_list, inline=True)
             if length > batch:
-                embed_page.set_footer(text=f'Page {self.page + 1} of {math.ceil(length / batch)} - {length} total')
+                embed_page.set_footer(text=f'Страница {self.page + 1} из {math.ceil(length / batch)} - {length}')
             self.contents.append(embed_page)
             self.page += 1
         self.page = 0
@@ -71,7 +71,7 @@ class InfoView(View):
 
     @discord.ui.button(
         custom_id="button_styles",
-        label="Styles", row=0)
+        label="Стили", row=0)
     async def button_style(self, _button, interaction):
         length = len(settings.global_var.style_names)
         batch = 8
@@ -89,7 +89,7 @@ class InfoView(View):
             styles.append(key)
 
         for i in range(0, length, batch):
-            embed_page = discord.Embed(title="Styles list", description=desc, colour=settings.global_var.embed_color)
+            embed_page = discord.Embed(title="Список стилей", description=desc, colour=settings.global_var.embed_color)
             for key in styles[i:i + batch]:
                 for keyB, value in settings.global_var.style_names.items():
                     if key == keyB:
@@ -100,7 +100,7 @@ class InfoView(View):
                         embed_page.add_field(name=f"**{key}**", value=f"``{value}``", inline=False)
                         break
             if length > batch:
-                embed_page.set_footer(text=f'Page {self.page + 1} of {math.ceil(length / batch)} - {length} total')
+                embed_page.set_footer(text=f'Страница {self.page + 1} из {math.ceil(length / batch)} - {length}')
             self.contents.append(embed_page)
             self.page += 1
         self.page = 0
@@ -112,7 +112,7 @@ class InfoView(View):
 
     @discord.ui.button(
         custom_id="button_hyper",
-        label="Hypernets", row=0)
+        label="Гиперсети", row=0)
     async def button_hyper(self, _button, interaction):
         length = len(settings.global_var.hyper_names)
         batch = 16
@@ -128,7 +128,7 @@ class InfoView(View):
 
         for i in range(0, length, batch * 2):
             hyper_column_a, hyper_column_b = '', ''
-            embed_page = discord.Embed(title="Hypernets list", description=desc, colour=settings.global_var.embed_color)
+            embed_page = discord.Embed(title="Список гиперсетей", description=desc, colour=settings.global_var.embed_color)
             for value in settings.global_var.hyper_names[i:i + batch]:
                 hyper_column_a += f'\n``{value}``'
             embed_page.add_field(name="", value=hyper_column_a, inline=True)
@@ -137,7 +137,7 @@ class InfoView(View):
                 hyper_column_b += f'\n``{value}``'
             embed_page.add_field(name="", value=hyper_column_b, inline=True)
             if length > batch * 2:
-                embed_page.set_footer(text=f'Page {self.page + 1} of {math.ceil(length / (batch * 2))} - {length} total')
+                embed_page.set_footer(text=f'Страница {self.page + 1} из {math.ceil(length / (batch * 2))} - {length}')
             self.contents.append(embed_page)
             self.page += 1
         self.page = 0
@@ -165,7 +165,7 @@ class InfoView(View):
 
         for i in range(0, length, batch * 2):
             lora_column_a, lora_column_b = '', ''
-            embed_page = discord.Embed(title="LoRA list", description=desc, colour=settings.global_var.embed_color)
+            embed_page = discord.Embed(title="Список LoRA моделей", description=desc, colour=settings.global_var.embed_color)
             for value in settings.global_var.lora_names[i:i+batch]:
                 lora_column_a += f'\n``{value}``'
             embed_page.add_field(name="", value=lora_column_a, inline=True)
@@ -174,7 +174,7 @@ class InfoView(View):
                 lora_column_b += f'\n``{value}``'
             embed_page.add_field(name="", value=lora_column_b, inline=True)
             if length > batch*2:
-                embed_page.set_footer(text=f'Page {self.page + 1} of {math.ceil(length / (batch * 2))} - {length} total')
+                embed_page.set_footer(text=f'Страница {self.page + 1} из {math.ceil(length / (batch * 2))} - {length}')
             self.contents.append(embed_page)
             self.page += 1
         self.page = 0
@@ -201,7 +201,7 @@ class InfoView(View):
 
         for i in range(0, sd1_length, batch * 2):
             embed_column_a, embed_column_b = '', ''
-            embed_page = discord.Embed(title="Textual Inversion embeddings list",
+            embed_page = discord.Embed(title="Список Textual Inversion embeddings",
                                        description=f"{desc}\nThese embeddings are for **SD 1.X** models.",
                                        colour=settings.global_var.embed_color)
             for value in settings.global_var.embeddings_1[i:i + batch]:
@@ -218,7 +218,7 @@ class InfoView(View):
 
         for i in range(0, sd2_length, batch * 2):
             embed_column_a, embed_column_b = '', ''
-            embed_page = discord.Embed(title="Textual Inversion embeddings list",
+            embed_page = discord.Embed(title="Список Textual Inversion embeddings",
                                        description=f"{desc}\nThese embeddings are for **SD 2.X** models.",
                                        colour=settings.global_var.embed_color)
             for value in settings.global_var.embeddings_2[i:i + batch]:
@@ -244,7 +244,7 @@ class InfoView(View):
         self.enable_nav_buttons()
         self.page = 0
 
-        embed_tips1 = discord.Embed(title="Documentation", description="Добро пожаловать в документацию! Здесь объяснаются основы использования и запросов.",
+        embed_tips1 = discord.Embed(title="Документация", description="Добро пожаловать в документацию! Здесь объяснаются основы использования и запросов.",
                                     colour=settings.global_var.embed_color)
         embed_tips1.add_field(name="txt2img", value="Текст в изображение. Используйте команду /draw. Просто опишите, что хотите получить и отправьте запрос!"
                                                           "\nЕсть множество дополнительных опций, но они автоматически устанавливаются согласно предустановок. Они необязательны, но помогают улучшить результат.")
@@ -255,12 +255,12 @@ class InfoView(View):
         embed_tips1.add_field(name="/upscale command", value="A simple command to upscale your image! You can upscale up to 4x at a time.")
         embed_tips1.add_field(name="\u200B", value="\u200B")
 
-        embed_tips2 = discord.Embed(title="Basic Prompting Tips", colour=settings.global_var.embed_color)
-        embed_tips2.add_field(name="Prompting",
-                              value="Word order influences the image. Putting `cat, dog` will lean more towards cat."
-                                   "\nKeep this in mind when doing very long prompts.",)
+        embed_tips2 = discord.Embed(title="Базовые подсказки по запросам", colour=settings.global_var.embed_color)
+        embed_tips2.add_field(name="Запросы",
+                              value="Порядок слов меняет изображение. Написав `cat, dog` выполучите больше кота."
+                                   "\nПомните об этом составляя длинное описание.",)
         embed_tips2.add_field(name="Steps",
-                              value="This is how many cycles the AI takes to create an image. More steps generally leads to better results, but not always!",)
+                              value="Шаги. Как много циклов сделает ИИ для создания изображения. Большее колличество шагов часто ведёт к более удачному изображению, но не всегда!",)
         embed_tips2.add_field(name="\u200B", value="\u200B")
         embed_tips2.add_field(name="Guidance Scale",
                               value="This represents how much importance is given to your prompt. The AI will give more attention to your prompt with higher values and be more creative with lower values.",)
@@ -271,35 +271,35 @@ class InfoView(View):
         embed_tips3 = discord.Embed(title="Basic Prompting Tips", description="This is some of the syntax that can be used with your prompts.",
                                     colour=settings.global_var.embed_color)
         embed_tips3.add_field(name="Emphasizing",
-                              value="`(word)`-each `()` increases attention to `word` by 1.1x"
-                                   "\n`[word]`-each `[]` decreases attention to `word` by 1.1x"
-                                   "\n`(word:1.5)`-increases attention to `word` by 1.5x"
-                                   "\n`(word:0.25)`-decreases attention to `word` by 4x"
-                                   "\n`\\(word\\)`-use literal () characters in prompt.",
+                              value="`(word)`- каждое `()` увеличивает внимание к `word` в 1.1x"
+                                   "\n`[word]`- каждое `[]` уменьшает внимание к `word` в 1.1x"
+                                   "\n`(word:1.5)`- увеличивает внимание к `word` в 1.5x"
+                                   "\n`(word:0.25)`- уменьшает внимание к `word` в 4x"
+                                   "\n`\\(word\\)`- использует непосредственно символы () в описании.",
                               inline=False)
-        embed_tips3.add_field(name="Transitioning",
+        embed_tips3.add_field(name="Переход",
                               value="`[word1:word2:steps]`"
-                                   "\nWhen generating an image, the AI will start at `word1`, then after the specified number of `steps`, switches to `word2`. Word order matters.",
+                                   "\nПри создании изображения, ИИ начнёт с `word1`, а после указанного значения шагов `steps`, перейдёт на `word2`. Порядок слов важен.",
                               inline=False)
-        embed_tips3.add_field(name="Alternating",
+        embed_tips3.add_field(name="Слияние",
                               value="`[word1|word2]`"
-                                   "\nWhen generating an image, the AI will alternate between the words for each step. Word order still applies.",
+                                   "\nПри создании изображения, ИИ будет смешивать word1 и word2. Порядок слов так же важен.",
                               inline=False)
 
-        embed_tips4 = discord.Embed(title="Buttons", description="Generated images contain some neat, convenient buttons!",
+        embed_tips4 = discord.Embed(title="Кнопки", description="Сгенерированные изображения содержат кнопки!",
                                     colour=settings.global_var.embed_color)
         embed_tips4.add_field(name="🖋️",
-                              value="This button opens a popup allowing you to adjust several options of your output, then will generate a new one based on the changes.")
+                              value="Эта кнопка вызывает всплывающее окно, позволяющее изменить некоторые параметры и сгенерировать новые изображения сэтими изменениями.")
         embed_tips4.add_field(name="🎲",
-                              value="Use this when you simply want to create a new image with the same options.")
+                              value="Используйте эту кнопку чтобы сгенерировать другие изображения стеми же параметрами.")
         embed_tips4.add_field(name="\u200B", value="\u200B")
         embed_tips4.add_field(name="📋",
-                              value="The clipboard provides the information used to make the image, and even provides the command for copying!")
+                              value="Эта кнопка показывает информацию о генерации изображенийи даже позволяет скопировать команду для генерации!")
         embed_tips4.add_field(name="❌",
-                              value="The button used to delete any unwanted outputs. If this button isn't working, you can add a ❌ reaction instead.")
+                              value="Крест используется для удаления любых нежелательных изображений. Если эта кнопка не работает, вы можете добавить реакцию ❌ вместо этого.")
         embed_tips4.add_field(name="\u200B", value="\u200B")
 
-        embed_tips5 = discord.Embed(title="Context menu",
+        embed_tips5 = discord.Embed(title="Контекстное меню",
                                     description="You have the option to use context menu commands on any message!\n"
                                                 "To use the commands, right-click (or tap and hold) any message then find me under 'Apps'.\n"
                                                 "\nThe context menu is useful if you need to interact with images when the buttons are missing or broken, or even interacting with images not created by me.",
