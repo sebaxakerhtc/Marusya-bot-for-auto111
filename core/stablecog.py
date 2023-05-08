@@ -1,5 +1,6 @@
 import base64
 import contextlib
+import threading
 import discord
 import io
 import math
@@ -17,6 +18,49 @@ from core import viewhandler
 from core import settings
 from core import settingscog
 
+
+async def update_progress(event_loop, status_message_task, s, queue_object, tries):
+    status_message = status_message_task.result()
+    try:
+        progress_data = s.get(url=f'{settings.global_var.url}/sdapi/v1/progress').json()
+
+        if progress_data["current_image"] is None and tries <= 10:
+            time.sleep(1)
+            event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, tries + 1))
+            return
+
+        if progress_data["current_image"] is None and tries > 10:
+            return
+
+        image = Image.open(io.BytesIO(base64.b64decode(progress_data["current_image"])))
+
+        with contextlib.ExitStack() as stack:
+            buffer = stack.enter_context(io.BytesIO())
+            image.save(buffer, 'PNG')
+            buffer.seek(0)
+            file = discord.File(fp=buffer, filename=f'{queue_object.seed}.png')
+
+        ips = round((int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
+        speed_comment = ''
+        if ips > 4:
+            speed_comment = '(ого, это супер **быстро**!)'
+        if ips < 1:
+            speed_comment = '(оу... это чертовски **медленно**!)'
+
+        view = viewhandler.ProgressView()
+
+        await status_message.edit(
+            content=f'**Автор**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
+                    f'**Описание**: `{queue_object.prompt}`\n**Прогресс**: {round(progress_data.get("progress") * 100, 2)}% '
+                    f'\n{progress_data.get("state").get("sampling_step")}/{queue_object.steps} iterations, '
+                    f'~{ips} итеркаций в секунду {speed_comment}'
+                    f'\n**Осталось**: {round(progress_data.get("eta_relative"), 2)} seconds',
+            files=[file], view=view)
+    except Exception as e:
+        print('что-то пошло не так...', str(e))
+
+    time.sleep(1)
+    event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, tries))
 
 class StableCog(commands.Cog, name='Stable Diffusion', description='Create images from natural language.'):
     ctx_parse = discord.ApplicationContext
@@ -60,14 +104,14 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         int,
         description='Width of the generated image.',
         required=False,
-        choices=[x for x in settings.global_var.size_range]
+        min_value=256,
     )
     @option(
         'height',
         int,
         description='Height of the generated image.',
         required=False,
-        choices=[x for x in settings.global_var.size_range]
+        min_value=256,
     )
     @option(
         'guidance_scale',
@@ -364,6 +408,23 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
     def dream(self, event_loop: queuehandler.GlobalQueue.event_loop, queue_object: queuehandler.DrawObject):
         try:
             start_time = time.time()
+            
+            status_message_task = event_loop.create_task(queue_object.ctx.channel.send(
+                f'**Автор**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
+                f'**Описание**: `{queue_object.prompt}`\n**Прогресс**: Инициализация...'
+                f'\n0/{queue_object.steps} итеракций, 0.00 итеракций в секунду'
+                f'\n**Осталось**: Инициализация...'))
+
+            def worker():
+                event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, 0))
+                return
+
+            status_thread = threading.Thread(target=worker)
+
+            def start_thread(*args):
+                status_thread.start()
+
+            status_message_task.add_done_callback(start_thread)           
 
             # construct a payload for data model, then the normal payload
             model_payload = {
@@ -404,8 +465,8 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                 highres_payload = {
                     "enable_hr": True,
                     "hr_upscaler": queue_object.highres_fix,
-                    "hr_scale": 1,
-                    "hr_second_pass_steps": int(queue_object.steps)/2,
+                    "hr_scale": 1.5,
+                    "hr_second_pass_steps": int(queue_object.steps),
                     "denoising_strength": queue_object.strength
                 }
                 payload.update(highres_payload)
@@ -473,6 +534,9 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
             view = queue_object.view
             # post to discord
+            def post_dream():
+                event_loop.create_task(status_message_task.result().delete())
+                
             with contextlib.ExitStack() as stack:
                 buffer_handles = [stack.enter_context(io.BytesIO()) for _ in pil_images]
 
