@@ -251,26 +251,26 @@ class InfoView(View):
         embed_tips1.add_field(name="img2img", value="Изображение в изображение. Используйте команду /draw, опция **init_img** позволяет загрузить изображение с устройства, а **init_url** использовать ссылку на изображение."
                                                            "\nПомните что **strength** взаимодействует с img2img. Значения от 0.0 до 1.0, большее значение больше воздействует на изображение.")
         embed_tips1.add_field(name="\u200B", value="\u200B")
-        embed_tips1.add_field(name="/identify command", value="This command makes a caption for your image. A standard caption is generated with normal **phrasing**, or tags can be used to generate a list of keywords.")
-        embed_tips1.add_field(name="/upscale command", value="A simple command to upscale your image! You can upscale up to 4x at a time.")
+        embed_tips1.add_field(name="команда /identify", value="Эта команда создаёт описание изображения. Стандартное описание генерируется фразами, а выбрав Тэги выполучте ключевые слова.")
+        embed_tips1.add_field(name="команда /upscale", value="Простая команда для увеличения изображения! Выможете увеличить изображение до 4x кратного.")
         embed_tips1.add_field(name="\u200B", value="\u200B")
 
-        embed_tips2 = discord.Embed(title="Базовые подсказки по запросам", colour=settings.global_var.embed_color)
-        embed_tips2.add_field(name="Запросы",
-                              value="Порядок слов меняет изображение. Написав `cat, dog` выполучите больше кота."
+        embed_tips2 = discord.Embed(title="Базовые подсказки по описанию запросов", colour=settings.global_var.embed_color)
+        embed_tips2.add_field(name="prompt",
+                              value="Описание запроса. Порядок слов меняет изображение. Написав `cat, dog` выполучите больше кота."
                                    "\nПомните об этом составляя длинное описание.",)
         embed_tips2.add_field(name="Steps",
                               value="Шаги. Как много циклов сделает ИИ для создания изображения. Большее колличество шагов часто ведёт к более удачному изображению, но не всегда!",)
         embed_tips2.add_field(name="\u200B", value="\u200B")
-        embed_tips2.add_field(name="Guidance Scale",
-                              value="This represents how much importance is given to your prompt. The AI will give more attention to your prompt with higher values and be more creative with lower values.",)
+        embed_tips2.add_field(name="Guidance (CFG) Scale",
+                              value="отвечает за то, насколько искуственный интеллект должен приблизиться к буквальному изображению запроса. Чем ниже Cfg Scale — тем креативнее будет ИИ. Чем выше Cfg Scale тем более точно ИИ будет пытаться изобразить запрос.",)
         embed_tips2.add_field(name="Seed",
-                              value="This value is the key used to generate an image. A seed can be used to recreate the same image or variations on it.",)
+                              value="Это ключ, используемый для генерации изображений. Значения от 0 до 4294967295. Может использоваться для повторной генерации изображения.",)
         embed_tips2.add_field(name="\u200B", value="\u200B")
 
-        embed_tips3 = discord.Embed(title="Basic Prompting Tips", description="This is some of the syntax that can be used with your prompts.",
+        embed_tips3 = discord.Embed(title="Основы описания запросов", description="Вот некоторые синтаксы для использования в описаниях.",
                                     colour=settings.global_var.embed_color)
-        embed_tips3.add_field(name="Emphasizing",
+        embed_tips3.add_field(name="Выделения",
                               value="`(word)`- каждое `()` увеличивает внимание к `word` в 1.1x"
                                    "\n`[word]`- каждое `[]` уменьшает внимание к `word` в 1.1x"
                                    "\n`(word:1.5)`- увеличивает внимание к `word` в 1.5x"
@@ -300,22 +300,22 @@ class InfoView(View):
         embed_tips4.add_field(name="\u200B", value="\u200B")
 
         embed_tips5 = discord.Embed(title="Контекстное меню",
-                                    description="You have the option to use context menu commands on any message!\n"
-                                                "To use the commands, right-click (or tap and hold) any message then find me under 'Apps'.\n"
-                                                "\nThe context menu is useful if you need to interact with images when the buttons are missing or broken, or even interacting with images not created by me.",
+                                    description="У вас есть возможность использовать команды из контекстного меню!\n"
+                                                "Чтоб использовать эти команды, клик правой кнопкой мышки (или нажать и держать) на любом сообщении. Вы найдёте меня в 'Приложения'.\n"
+                                                "\nКонтекстное меню полезно, когда вам необходимо взаимодействие с изображением, но кнопки отсутствуют или не работают, или даже с изображениями, которые созданы не мной.",
                                     colour=settings.global_var.embed_color)
         # For those who fork AIYA, feel free to edit or add to this per your needs,
         # but please don't just delete me from credits and claim my work as yours.
         url = 'https://github.com/Kilvoctu/aiyabot'
-        thumb = 'https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/previewthumb.png'
+        thumb = 'https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D0%B5%D0%BD%D1%8C%D0%BA%D0%B0.png'
         wiki = 'https://github.com/Kilvoctu/aiyabot/wiki#using-aiya'
-        embed_tips6 = discord.Embed(title="Extra Information",
-                                    description=f"For more detailed documentation, check out the [wiki]({wiki}) in my [home]({url})!\n\n"
-                                                f"Also, feel free to report bugs or leave feedback! I'm open-source Python Discord bot AIYA, developed by *Kilvoctu#1238*, maintained with care."
-                                                f"\n\nPlease enjoy making AI art with me~!",
+        embed_tips6 = discord.Embed(title="Дополнительная информация",
+                                    description=f"Более подробная документация на английском языкедоступна в [wiki]({wiki}) оригинального проекта [home]({url})!\n\n"
+                                                f"Не стесняйтесь делиться ошибками и отзывами! Я - Маруся, Discord бот на базе Python, разработанный *Kilvoctu#1238*. Перевод/Миграция от *sebaxakerhtc*."
+                                                f"\n\nНаслаждайтесь созданием ИИ искусств со мной!",
                                     colour=settings.global_var.embed_color)
         embed_tips6.set_thumbnail(url=thumb)
-        embed_tips6.set_footer(text='Have a lovely day!', icon_url=thumb)
+        embed_tips6.set_footer(text='Приятного времяпровождения!', icon_url=thumb)
 
         self.page = 0
         self.contents = [
@@ -358,13 +358,13 @@ class InfoCog(commands.Cog):
     async def on_ready(self):
         self.bot.add_view(InfoView())
 
-    @commands.slash_command(name="info", description="Lots of useful information!")
+    @commands.slash_command(name="info", description="Много полезной информации!")
     async def info(self, ctx):
-        first_embed = discord.Embed(title='Select a button!',
-                                    description='You can check lists of any extra content I have loaded!'
-                                                '\nAlso check documentation for usage information!',
+        first_embed = discord.Embed(title='Выберите кнопку!',
+                                    description='Вы можете проверить списки дополнительного контента, загруженного мной!'
+                                                '\nТак же проверьте документацию о взаимодействии!',
                                     colour=settings.global_var.embed_color)
-        first_embed.set_footer(text='Use ◀️ and ▶️ to change pages when available')
+        first_embed.set_footer(text='Используйте ◀️ и ▶️ для переключения страниц, когда это доступно')
 
         await ctx.respond(embed=first_embed, view=InfoView(), ephemeral=True)
 
