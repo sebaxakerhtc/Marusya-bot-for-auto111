@@ -138,14 +138,14 @@ async def parse_image_info(ctx, image_url, command):
             negative_prompt = mod_results[3]
 
         # create embed and give the best effort in trying to parse the png info
-        embed = discord.Embed(title="About the image!", description="")
+        embed = discord.Embed(title="Об изображении!", description="")
         if not has_init_url:  # for some reason this bugs out the embed
             embed.set_thumbnail(url=image_url)
         if len(prompt_field) > 1024:
             prompt_field = f'{prompt_field[:1010]}....'
         embed.colour = settings.global_var.embed_color
-        embed.add_field(name=f'Prompt', value=f'``{prompt_field}``', inline=False)
-        embed.add_field(name='Data model', value=f'Display name - ``{display_name}``\nModel name - ``{model_name}``'
+        embed.add_field(name=f'Описание', value=f'``{prompt_field}``', inline=False)
+        embed.add_field(name='Модель', value=f'Отображаемое имя - ``{display_name}``\nИмя модели - ``{model_name}``'
                                                  f'\nShorthash - ``{model_hash}``{activator_token}', inline=False)
 
         copy_command = f'/draw prompt:{prompt_field} steps:{steps} width:{width_height[0]} height:{width_height[1]}' \
@@ -158,17 +158,17 @@ async def parse_image_info(ctx, image_url, command):
             n_prompt_field = negative_prompt
             if len(n_prompt_field) > 1024:
                 n_prompt_field = f'{n_prompt_field[:1010]}....'
-            embed.add_field(name=f'Negative prompt', value=f'``{n_prompt_field}``', inline=False)
+            embed.add_field(name=f'Нежелательное описание', value=f'``{n_prompt_field}``', inline=False)
 
-        extra_params = f'Sampling steps: ``{steps}``\nSize: ``{size}``\nClassifier-free guidance scale: ' \
-                       f'``{guidance_scale}``\nSampling method: ``{sampler}``\nSeed: ``{seed}``'
+        extra_params = f'Шаги: ``{steps}``\nРазмер: ``{size}``\nCFG scale: ' \
+                       f'``{guidance_scale}``\nСэмплер: ``{sampler}``\nSeed: ``{seed}``'
 
         if style:
             copy_command += f' styles:{style[0]}'
-            extra_params += f'\nStyle preset: ``{style[0]}``'
+            extra_params += f'\nСтиль: ``{style[0]}``'
         if facefix:
             copy_command += f' facefix:{facefix}'
-            extra_params += f'\nFace restoration model: ``{facefix}``'
+            extra_params += f'\nМодель восстановления лиц: ``{facefix}``'
         if highres_fix:
             copy_command += f' highres_fix:{highres_fix}'
             extra_params += f'\nHigh-res fix: ``{highres_fix}``'
@@ -176,21 +176,21 @@ async def parse_image_info(ctx, image_url, command):
             copy_command += f' clip_skip:{clip_skip}'
             extra_params += f'\nCLIP skip: ``{clip_skip}``'
 
-        embed.add_field(name=f'Other parameters', value=extra_params, inline=False)
+        embed.add_field(name=f'Другие параметры', value=extra_params, inline=False)
 
         if lora or hypernet:
             network_params = ''
             for key, value in hypernet.items():
                 network_params += f'\nLoRA: ``{key}`` (multiplier: ``{value}``)'
             for key, value in lora.items():
-                network_params += f'\nHypernet: ``{key}`` (multiplier: ``{value}``)'
+                network_params += f'\nГиперсеть: ``{key}`` (multiplier: ``{value}``)'
             embed.add_field(name=f'Extra networks', value=network_params, inline=False)
 
         if has_init_url:
             # not interested in adding embed fields for strength and init_image
             copy_command += f' strength:{strength} init_url:{str(ctx)}'
 
-        embed.add_field(name=f'Command for copying', value=f'', inline=False)
+        embed.add_field(name=f'Команда для копирования', value=f'', inline=False)
         embed.set_footer(text=copy_command)
 
         if command == 'button':
