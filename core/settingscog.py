@@ -49,137 +49,137 @@ class SettingsCog(commands.Cog):
             hires for hires in settings.global_var.hires_upscaler_names
         ]
 
-    @commands.slash_command(name='settings', description='Review and change channel defaults', guild_only=True)
+    @commands.slash_command(name='settings', description='Просмотр и изменение настроек по умолчанию для канала', guild_only=True)
     @option(
         'current_settings',
         bool,
-        description='Show the current defaults for the channel.',
+        description='Показать текущие настройки для канала.',
         required=False,
     )
     @option(
         'n_prompt',
         str,
-        description='Set default negative prompt for the channel (put "reset" to return to empty prompt)',
+        description='Нежелательное описание (напишите "reset" чтоб вернуть к пустому)',
         required=False,
     )
     @option(
         'data_model',
         str,
-        description='Set default data model for image generation',
+        description='Модель',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(model_autocomplete),
     )
     @option(
         'steps',
         int,
-        description='Set default amount of steps for the channel',
+        description='Колличество шагов',
         min_value=1,
         required=False,
     )
     @option(
         'max_steps',
         int,
-        description='Set maximum steps for the channel',
+        description='Максимальное колличество шагов',
         min_value=1,
         required=False,
     )
     @option(
         'width',
         int,
-        description='Set default width for the channel',
+        description='Ширина изображения',
         required=False,
-        choices=[x for x in range(192, 1088, 64)]
+        choices=[x for x in range(512, 1312, 32)]
     )
     @option(
         'height',
         int,
-        description='Set default height for the channel',
+        description='Высота изображения',
         required=False,
-        choices=[x for x in range(192, 1088, 64)]
+        choices=[x for x in range(512, 1312, 32)]
     )
     @option(
         'guidance_scale',
         str,
-        description='Set default Classifier-Free Guidance scale for the channel.',
+        description='Значение CFG Scale.',
         required=False,
     )
     @option(
         'sampler',
         str,
-        description='Set default sampler for the channel',
+        description='Сэмплер',
         required=False,
         choices=settings.global_var.sampler_names,
     )
     @option(
         'styles',
         str,
-        description='Apply a predefined style to the generation.',
+        description='Стиль',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(style_autocomplete),
     )
     @option(
         'hypernet',
         str,
-        description='Set default hypernetwork model for the channel',
+        description='Гиперсеть',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(hyper_autocomplete),
     )
     @option(
         'lora',
         str,
-        description='Set default LoRA for the channel',
+        description='LoRA',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(lora_autocomplete),
     )
     @option(
         'facefix',
         str,
-        description='Tries to improve faces in images.',
+        description='Восстановление лиц.',
         required=False,
         choices=settings.global_var.facefix_models,
     )
     @option(
         'highres_fix',
         str,
-        description='Set default highres fix model for the channel',
+        description='Увеличениие разрешения',
         required=False,
         autocomplete=discord.utils.basic_autocomplete(hires_autocomplete),
     )
     @option(
         'clip_skip',
         int,
-        description='Set default CLIP skip for the channel',
+        description='CLIP skip',
         required=False,
         choices=[x for x in range(1, 13, 1)]
     )
     @option(
         'strength',
         str,
-        description='Set default strength (for init_img) for the channel (0.0 to 1.0).'
+        description='Сила (для init_img) в пределах (0.0 to 1.0).'
     )
     @option(
         'batch',
         str,
-        description='Set default batch for the channel (count,size)',
+        description='batch (компановка) (колличество,размер)',
         required=False,
     )
     @option(
         'max_batch',
         str,
-        description='Set maximum batch for the channel (count,size)',
+        description='Максимальный batch (компановка) (колличество,размер)',
         required=False,
     )
     @option(
         'upscaler_1',
         str,
-        description='Set default upscaler model for the channel.',
+        description='Модель увеличения изображения.',
         required=True,
         autocomplete=discord.utils.basic_autocomplete(upscaler_autocomplete),
     )
     @option(
         'refresh',
         bool,
-        description='Use to update global lists (models, styles, embeddings, etc.)',
+        description='Используйте для обновления всех списков (модели, стили, embeddings, и т.д.)',
         required=False,
     )
     async def settings_handler(self, ctx,
@@ -207,8 +207,8 @@ class SettingsCog(commands.Cog):
         settings.check(channel)
         reviewer = settings.read(channel)
         # create the embed for the reply
-        embed = discord.Embed(title="Channel Defaults Summary", description="")
-        embed.set_footer(text=f'Channel id: {channel}')
+        embed = discord.Embed(title="Все настройки канала", description="")
+        embed.set_footer(text=f'id канала: {channel}')
         embed.colour = settings.global_var.embed_color
         current, new, new_n_prompt = '', '', ''
         dummy_prompt, lora_multi, hyper_multi = '', 0.85, 0.85
@@ -223,14 +223,14 @@ class SettingsCog(commands.Cog):
                     if value == '':
                         value = ' '
                     current += f'\n{key} - ``{value}``'
-            embed.add_field(name=f'Current parameters', value=current, inline=True)
+            embed.add_field(name=f'Текущие значения', value=current, inline=True)
             # put negative prompt on new field for hosts who like massive negative prompts
             cur_n_prompt = f'{cur_set["negative_prompt"]}'
             if cur_n_prompt == '':
                 cur_n_prompt = ' '
             elif len(cur_n_prompt) > 1024:
                 cur_n_prompt = f'{cur_n_prompt[:1010]}....'
-            embed.add_field(name=f'Current negative prompt', value=f'``{cur_n_prompt}``', inline=True)
+            embed.add_field(name=f'Нежелательное описание', value=f'``{cur_n_prompt}``', inline=True)
 
         # run function to update global variables
         if refresh:
@@ -244,7 +244,7 @@ class SettingsCog(commands.Cog):
             settings.global_var.lora_names.clear()
             settings.global_var.upscaler_names.clear()
             settings.populate_global_vars()
-            embed.add_field(name=f'Refreshed!', value=f'Updated global lists', inline=False)
+            embed.add_field(name=f'Обновлено!', value=f'Все списки обновлены', inline=False)
 
         # run through each command and update the defaults user selects
         if n_prompt is not None:
@@ -258,26 +258,26 @@ class SettingsCog(commands.Cog):
 
         if data_model is not None:
             settings.update(channel, 'data_model', data_model)
-            new += f'\nData model: ``"{data_model}"``'
+            new += f'\nМодель: ``"{data_model}"``'
             set_new = True
 
         if max_steps != 1:
             settings.update(channel, 'max_steps', max_steps)
-            new += f'\nMax steps: ``{max_steps}``'
+            new += f'\nМаксимум шагов: ``{max_steps}``'
             # automatically lower default steps if max steps goes below it
             if max_steps < reviewer['steps']:
                 settings.update(channel, 'steps', max_steps)
-                new += f'\nDefault steps is too high! Lowering to ``{max_steps}``.'
+                new += f'\nСлишком большое значение шагов! Снижаю до ``{max_steps}``.'
             set_new = True
 
         if width is not None:
             settings.update(channel, 'width', width)
-            new += f'\nWidth: ``"{width}"``'
+            new += f'\nШирина: ``"{width}"``'
             set_new = True
 
         if height is not None:
             settings.update(channel, 'height', height)
-            new += f'\nHeight: ``"{height}"``'
+            new += f'\nВысота: ``"{height}"``'
             set_new = True
 
         if guidance_scale is not None:
@@ -287,27 +287,27 @@ class SettingsCog(commands.Cog):
                 new += f'\nGuidance Scale: ``{guidance_scale}``'
             except(Exception,):
                 settings.update(channel, 'guidance_scale', '7.0')
-                new += f'\nHad trouble setting Guidance Scale! Setting to default of `7.0`.'
+                new += f'\nНе удалось установить Guidance Scale! Устанавливаю по умолчанию `7.0`.'
             set_new = True
 
         if sampler is not None:
             settings.update(channel, 'sampler', sampler)
-            new += f'\nSampler: ``"{sampler}"``'
+            new += f'\nСэмплер: ``"{sampler}"``'
             set_new = True
 
         if styles is not None:
             settings.update(channel, 'style', styles)
-            new += f'\nStyle: ``"{styles}"``'
+            new += f'\nСтиль: ``"{styles}"``'
             set_new = True
 
         if facefix is not None:
             settings.update(channel, 'facefix', facefix)
-            new += f'\nFacefix: ``"{facefix}"``'
+            new += f'\nВосстановление лиц: ``"{facefix}"``'
             set_new = True
 
         if highres_fix is not None:
             settings.update(channel, 'highres_fix', highres_fix)
-            new += f'\nhighres_fix: ``"{highres_fix}"``'
+            new += f'\nУвеличение изображения: ``"{highres_fix}"``'
             set_new = True
 
         if clip_skip is not None:
@@ -322,7 +322,7 @@ class SettingsCog(commands.Cog):
                 settings.update(channel, 'hypernet_multi', hyper_multi)
                 message = f' (multiplier: ``{hyper_multi}``)'
             settings.update(channel, 'hypernet', hypernet)
-            new += f'\nHypernet: ``"{hypernet}"``{message}'
+            new += f'\nГиперсеть: ``"{hypernet}"``{message}'
             set_new = True
 
         if lora is not None:
@@ -337,12 +337,12 @@ class SettingsCog(commands.Cog):
 
         if strength is not None:
             settings.update(channel, 'strength', strength)
-            new += f'\nStrength: ``"{strength}"``'
+            new += f'\nСила: ``"{strength}"``'
             set_new = True
 
         if upscaler_1 is not None:
             settings.update(channel, 'upscaler_1', upscaler_1)
-            new += f'\nUpscaler 1: ``"{upscaler_1}"``'
+            new += f'\nУвеличение изображений 1: ``"{upscaler_1}"``'
             set_new = True
 
         if max_batch is not None:
@@ -350,27 +350,27 @@ class SettingsCog(commands.Cog):
             max_batch = settings.batch_format(max_batch)
 
             settings.update(channel, 'max_batch', f'{max_batch[0]},{max_batch[1]}')
-            new += f'\nMax batch (count,size): ``{max_batch[0]},{max_batch[1]}``'
+            new += f'\nМаксимальный batch (колличество,размер): ``{max_batch[0]},{max_batch[1]}``'
             # automatically lower default batch if max batch goes below it
             if max_batch[0] < batch_check[0]:
                 settings.update(channel, 'batch', f'{max_batch[0]},{batch_check[1]}')
-                new += f'\nDefault batch count is too high! Lowering to ``{max_batch[0]}``.'
+                new += f'\nКолличество batch слишком большое! Снижаю до ``{max_batch[0]}``.'
             if max_batch[1] < batch_check[1]:
                 if max_batch[0] < batch_check[0]:
                     settings.update(channel, 'batch', f'{max_batch[0]},{max_batch[1]}')
                 else:
                     settings.update(channel, 'batch', f'{batch_check[0]},{max_batch[1]}')
-                new += f'\nDefault batch size is too high! Lowering to ``{max_batch[1]}``.'
+                new += f'\nРазмер batch слишком большой! Снижаю до ``{max_batch[1]}``.'
             set_new = True
 
         # review settings again in case user is trying to set steps/counts and max steps/counts simultaneously
         reviewer = settings.read(channel)
         if steps is not None:
             if steps > reviewer['max_steps']:
-                new += f"\nMax steps is ``{reviewer['max_steps']}``! You can't go beyond it!"
+                new += f"\nМаксимум шагов ``{reviewer['max_steps']}``! Вы не можете установить больше!"
             else:
                 settings.update(channel, 'steps', steps)
-                new += f'\nSteps: ``{steps}``'
+                new += f'\nШаги: ``{steps}``'
             set_new = True
 
         if batch is not None:
@@ -378,18 +378,18 @@ class SettingsCog(commands.Cog):
             max_batch_check = settings.batch_format(reviewer['max_batch'])
 
             if batch[0] > max_batch_check[0]:
-                new += f"\nMax batch count is ``{max_batch_check[0]}``! You can't go beyond it!"
+                new += f"\nМаксимальное колличесво batch ``{max_batch_check[0]}``! Вы не можете установить больше!"
             elif batch[1] > max_batch_check[1]:
-                new += f"\nMax batch size is ``{max_batch_check[1]}``! You can't go beyond it!"
+                new += f"\nМаксимальный размер batch ``{max_batch_check[1]}``! Вы не можете установить больше!"
             else:
                 settings.update(channel, 'batch', f'{batch[0]},{batch[1]}')
-                new += f'\nbatch (count,size): ``{batch[0]},{batch[1]}``'
+                new += f'\nbatch (колличество,размер): ``{batch[0]},{batch[1]}``'
             set_new = True
 
         if set_new:
-            embed.add_field(name=f'New defaults', value=new, inline=False)
+            embed.add_field(name=f'Новые значения', value=new, inline=False)
         if new_n_prompt:
-            embed.add_field(name=f'New default negative prompt', value=f'``{new_n_prompt}``', inline=False)
+            embed.add_field(name=f'Новое нежелательное описание', value=f'``{new_n_prompt}``', inline=False)
 
         await ctx.send_response(embed=embed, ephemeral=True)
 
