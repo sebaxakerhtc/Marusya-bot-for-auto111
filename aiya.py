@@ -29,22 +29,22 @@ self.load_extension('core.infocog')
 
 
 # stats slash command
-@self.slash_command(name='stats', description='How many images have I generated?')
+@self.slash_command(name='stats', description='Сколько изображений я сгенерировала?')
 async def stats(ctx):
     with open('resources/stats.txt', 'r') as f:
         data = list(map(int, f.readlines()))
-    embed = discord.Embed(title='Art generated', description=f'I have created {data[0]} pictures!',
+    embed = discord.Embed(title='Изображений сгенерировано', description=f'Я создала произведений искусств: {data[0]}!',
                           color=settings.global_var.embed_color)
     await ctx.respond(embed=embed)
 
 
 # context menu commands
-@self.message_command(name="Get Image Info")
+@self.message_command(name="Информация")
 async def get_image_info(ctx, message: discord.Message):
     await ctxmenuhandler.get_image_info(ctx, message)
 
 
-@self.message_command(name=f"Quick Upscale")
+@self.message_command(name=f"Быстрое увеличение")
 async def quick_upscale(ctx, message: discord.Message):
     await ctxmenuhandler.quick_upscale(self, ctx, message)
 
