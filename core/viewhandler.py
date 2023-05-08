@@ -51,14 +51,14 @@ class DrawModal(Modal):
 
         self.add_item(
             InputText(
-                label='Input your new prompt',
+                label='Описание запроса',
                 value=input_tuple[1],
                 style=discord.InputTextStyle.long
             )
         )
         self.add_item(
             InputText(
-                label='Input your new negative prompt (optional)',
+                label='Нежелательное описание запроса(необязательно)',
                 style=discord.InputTextStyle.long,
                 value=self.clean_negative,
                 required=False
@@ -66,7 +66,7 @@ class DrawModal(Modal):
         )
         self.add_item(
             InputText(
-                label='Keep seed? Delete to randomize',
+                label='Тот же seed? Удалите для случайного значения',
                 style=discord.InputTextStyle.short,
                 value=input_tuple[10],
                 required=False
@@ -89,7 +89,7 @@ class DrawModal(Modal):
 
         self.add_item(
             InputText(
-                label='Extended edit (for advanced user!)',
+                label='Расширеннэ настройки (для продвинутых!)',
                 style=discord.InputTextStyle.long,
                 value=ex_params,
                 required=False
@@ -117,7 +117,7 @@ class DrawModal(Modal):
         invalid_input = False
         infocog_view = infocog.InfoView()
         net_multi, new_net_multi = 0.85, 0
-        embed_err = discord.Embed(title="I can't redraw this!", description="")
+        embed_err = discord.Embed(title="Я не могу перерисовать это!", description="")
         # if extra network is used, find the multiplier
         if pen[18]:
             if pen[18] in pen[2]:
@@ -139,8 +139,8 @@ class DrawModal(Modal):
                             new_token = f'{model[1][3]} '.lstrip(' ')
                             break
                     if not model_found:
-                        embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not found.",
-                                            value="I used the info command for you! Try one of these models!")
+                        embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не найдено.",
+                                            value="Я использовала команду info для вас! Попробуйте одну из этих моделей!")
                         await interaction.response.send_message(embed=embed_err, ephemeral=True)
                         await infocog.InfoView.button_model(infocog_view, '', interaction)
                         return
@@ -151,14 +151,14 @@ class DrawModal(Modal):
                     pen[5] = line.split(':', 1)[1]
                 else:
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` steps is beyond the boundary!",
-                                        value=f"Keep steps between `0` and `{max_steps}`.", inline=False)
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` значение шагов за границей доступных!",
+                                        value=f"Шаги должны быть между `0` и `{max_steps}`.", inline=False)
             if 'width:' in line:
                 try:
                     pen[6] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
                 except(Exception,):
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` width is no good! These widths I can do.",
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая ширина! Вот ширина, которая может быть.",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.size_range]),
                                         inline=False)
             if 'height:' in line:
@@ -166,7 +166,7 @@ class DrawModal(Modal):
                     pen[7] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
                 except(Exception,):
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` height is no good! These heights I can do.",
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая высота! Вот высота, которая может быть.",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.size_range]),
                                         inline=False)
             if 'guidance_scale:' in line:
@@ -174,14 +174,14 @@ class DrawModal(Modal):
                     pen[8] = float(line.split(':', 1)[1].replace(",", "."))
                 except(Exception,):
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for the guidance scale!",
-                                        value='Make sure you enter a number.', inline=False)
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не подходит для guidance scale!",
+                                        value='Убедитесь, что вводите цифры.', inline=False)
             if 'sampler:' in line:
                 if line.split(':', 1)[1] in settings.global_var.sampler_names:
                     pen[9] = line.split(':', 1)[1]
                 else:
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is unrecognized. I know of these samplers!",
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не распознан. Мне известны следущие сэмплеры!",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.sampler_names]),
                                         inline=False)
             if 'strength:' in line:
@@ -189,15 +189,15 @@ class DrawModal(Modal):
                     pen[11] = float(line.split(':', 1)[1].replace(",", "."))
                 except(Exception,):
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for strength!.",
-                                        value='Make sure you enter a number (preferably between 0.0 and 1.0).',
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не подходит для силы!.",
+                                        value='Убедитесь, что вводите цифры (предпочтительно от 0.0 до 1.0).',
                                         inline=False)
             if 'styles:' in line:
                 if line.split(':', 1)[1] in settings.global_var.style_names.keys():
                     pen[14] = line.split(':', 1)[1]
                 else:
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` isn't my style.",
-                                        value="I've pulled up the styles list for you from the info command!")
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не мой стиль.",
+                                        value="Я загрузила список стилей для вас используя команду info!")
                     await interaction.response.send_message(embed=embed_err, ephemeral=True)
                     await infocog.InfoView.button_style(infocog_view, '', interaction)
                     return
@@ -207,7 +207,7 @@ class DrawModal(Modal):
                     pen[15] = line.split(':', 1)[1]
                 else:
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` can't fix faces! I have suggestions.",
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` невозможно восстановить лица! У меня есть предложения.",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.facefix_models]),
                                         inline=False)
             if 'clip_skip:' in line:
@@ -215,8 +215,8 @@ class DrawModal(Modal):
                     pen[17] = [x for x in range(1, 14, 1) if x == int(line.split(':', 1)[1])][0]
                 except(Exception,):
                     invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is too much CLIP to skip!",
-                                        value='The range is from `1` to `12`.', inline=False)
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` слишком много CLIP для пропуска!",
+                                        value='Значение должно быть от `1` до `12`.', inline=False)
             if 'extra_net:' in line:
                 if line.count(':') == 2:
                     net_check = re.search(':(.*):', line).group(1)
@@ -225,8 +225,8 @@ class DrawModal(Modal):
                 elif line.count(':') == 1 and line.split(':', 1)[1] in settings.global_var.extra_nets:
                     pen[18] = line.split(':', 1)[1]
                 else:
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is an unknown extra network!",
-                                        value="I used the info command for you! Please review the hypernets and LoRAs.")
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неизвестная extra network!",
+                                        value="Я использовала команду info для вас! Пожалуйста проверьте гиперсети и LoRAs.")
                     await interaction.response.send_message(embed=embed_err, ephemeral=True)
                     await infocog.InfoView.button_hyper(infocog_view, '', interaction)
                     return
@@ -240,7 +240,7 @@ class DrawModal(Modal):
             if settings.global_var.prompt_ban_list or settings.global_var.prompt_ignore_list or settings.global_var.negative_prompt_prefix:
                 mod_results = settings.prompt_mod(self.children[0].value, self.children[1].value)
                 if settings.global_var.prompt_ban_list and mod_results[0] == "Stop":
-                    await interaction.response.send_message(f"I'm not allowed to draw the word {mod_results[1]}!", ephemeral=True)
+                    await interaction.response.send_message(f"Мне не позволено использовать слово {mod_results[1]}!", ephemeral=True)
                     return
                 if settings.global_var.prompt_ignore_list or settings.global_var.negative_prompt_prefix and mod_results[0] == "Mod":
                     if settings.global_var.display_ignored_words == "False":
@@ -266,22 +266,22 @@ class DrawModal(Modal):
             draw_dream = stablecog.StableCog(self)
 
             # message additions if anything was changed
-            prompt_output = f'\nNew prompt: ``{pen[1]}``'
+            prompt_output = f'\nНовое описание: ``{pen[1]}``'
             if new_clean_negative != '' and new_clean_negative != self.clean_negative:
-                prompt_output += f'\nNew negative prompt: ``{new_clean_negative}``'
+                prompt_output += f'\nНовое нежелательное описание: ``{new_clean_negative}``'
             if str(pen[4]) != str(self.input_tuple[4]):
-                prompt_output += f'\nNew model: ``{new_model}``'
+                prompt_output += f'\nНовая модель: ``{new_model}``'
             index_start = 5
             for index, value in enumerate(tuple_names[index_start:], index_start):
                 if index == 13 or index == 16 or index == 18:
                     continue
                 if str(pen[index]) != str(self.input_tuple[index]):
-                    prompt_output += f'\nNew {value}: ``{pen[index]}``'
+                    prompt_output += f'\nНовое значение {value}: ``{pen[index]}``'
             if str(pen[18]) != 'None':
                 if str(pen[18]) != str(self.input_tuple[18]) and new_net_multi != net_multi or new_net_multi != net_multi:
-                    prompt_output += f'\nNew extra network: ``{pen[18]}`` (multiplier: ``{new_net_multi}``)'
+                    prompt_output += f'\nНовая extra network: ``{pen[18]}`` (multiplier: ``{new_net_multi}``)'
                 elif str(pen[18]) != str(self.input_tuple[18]):
-                    prompt_output += f'\nNew extra network: ``{pen[18]}``'
+                    prompt_output += f'\nНовая extra network: ``{pen[18]}``'
 
             print(f'Redraw -- {interaction.user.name}#{interaction.user.discriminator} -- Prompt: {pen[1]}')
 
@@ -290,7 +290,7 @@ class DrawModal(Modal):
                 queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
             else:
                 await queuehandler.process_dream(draw_dream, queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
-            await interaction.response.send_message(f'<@{interaction.user.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}``{prompt_output}')
+            await interaction.response.send_message(f'<@{interaction.user.id}>, {settings.messages()}\nЗапрос: ``{len(queuehandler.GlobalQueue.queue)}``{prompt_output}')
 
 
 # creating the view that holds the buttons for /draw output
@@ -311,19 +311,19 @@ class DrawView(View):
                 user_queue_limit = settings.queue_check(interaction.user)
                 if queuehandler.GlobalQueue.dream_thread.is_alive():
                     if user_queue_limit == "Stop":
-                        await interaction.response.send_message(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                        await interaction.response.send_message(content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.", ephemeral=True)
                     else:
                         await interaction.response.send_modal(DrawModal(self.input_tuple))
                 else:
                     await interaction.response.send_modal(DrawModal(self.input_tuple))
             else:
-                await interaction.response.send_message("You can't use other people's 🖋!", ephemeral=True)
+                await interaction.response.send_message("Вы не можете использовать 🖋 других людей!", ephemeral=True)
         except Exception as e:
             print('The pen button broke: ' + str(e))
             # if interaction fails, assume it's because aiya restarted (breaks buttons)
             button.disabled = True
             await interaction.response.edit_message(view=self)
-            await interaction.followup.send("I may have been restarted. This button no longer works.", ephemeral=True)
+            await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.", ephemeral=True)
 
     # the 🎲 button will take the same parameters for the image, change the seed, and add a task to the queue
     @discord.ui.button(
@@ -348,7 +348,7 @@ class DrawView(View):
                 user_queue_limit = settings.queue_check(interaction.user)
                 if queuehandler.GlobalQueue.dream_thread.is_alive():
                     if user_queue_limit == "Stop":
-                        await interaction.response.send_message(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                        await interaction.response.send_message(content=f"Пожалуйста, ждите! Вы исчерпали лимит запросов: {settings.global_var.queue_limit}.", ephemeral=True)
                     else:
                         queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(stablecog.StableCog(self), *seed_tuple, DrawView(seed_tuple)))
                 else:
@@ -356,11 +356,11 @@ class DrawView(View):
 
                 if user_queue_limit != "Stop":
                     await interaction.response.send_message(
-                        f'<@{interaction.user.id}>, {settings.messages()}\nQueue: '
+                        f'<@{interaction.user.id}>, {settings.messages()}\nЗапрос: '
                         f'``{len(queuehandler.GlobalQueue.queue)}`` - ``{seed_tuple[1]}``'
                         f'\nНовый Seed:``{seed_tuple[10]}``')
             else:
-                await interaction.response.send_message("You can't use other people's 🎲!", ephemeral=True)
+                await interaction.response.send_message("Вы не можете использовать 🎲 других людей!", ephemeral=True)
         except Exception as e:
             print('The dice roll button broke: ' + str(e))
             # if interaction fails, assume it's because aiya restarted (breaks buttons)
@@ -400,12 +400,12 @@ class DrawView(View):
             if interaction.user.id == self.input_tuple[0].author.id:
                 await interaction.message.delete()
             else:
-                await interaction.response.send_message("You can't delete other people's images!", ephemeral=True)
+                await interaction.response.send_message("Вы не можете удалять изображения других людей!", ephemeral=True)
         except(Exception,):
             button.disabled = True
             await interaction.response.edit_message(view=self)
             await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.\n"
-                                            "Вы можете использовать ❌ для удаления изображений.", ephemeral=True)
+                                            "Вы можете поставить реакцию ❌ для удаления изображений.", ephemeral=True)
 
 
 class DeleteView(View):
@@ -422,9 +422,9 @@ class DeleteView(View):
             if interaction.user.id == self.input_tuple[0].author.id:
                 await interaction.message.delete()
             else:
-                await interaction.response.send_message("You can't delete other people's images!", ephemeral=True)
+                await interaction.response.send_message("Вы не можете удалять изображения других людей!", ephemeral=True)
         except(Exception,):
             button.disabled = True
             await interaction.response.edit_message(view=self)
             await interaction.followup.send("Вероятно я была перезапущена. Эта кнопка больше не работает.\n"
-                                            "Вы можете использовать ❌ для удаления изображений.", ephemeral=True)
+                                            "Вы можете поставить реакцию ❌ для удаления изображений.", ephemeral=True)
