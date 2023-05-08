@@ -1,6 +1,7 @@
 import discord
 import random
 import re
+import requests
 from discord.ui import InputText, Modal, View
 
 from core import ctxmenuhandler
@@ -155,7 +156,7 @@ class DrawModal(Modal):
                                         value=f"Шаги должны быть между `0` и `{max_steps}`.", inline=False)
             if 'width:' in line:
                 try:
-                    pen[6] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
+                    pen[6] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая ширина! Вот ширина, которая может быть.",
@@ -163,7 +164,7 @@ class DrawModal(Modal):
                                         inline=False)
             if 'height:' in line:
                 try:
-                    pen[7] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
+                    pen[7] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая высота! Вот высота, которая может быть.",
@@ -291,7 +292,32 @@ class DrawModal(Modal):
             else:
                 await queuehandler.process_dream(draw_dream, queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
             await interaction.response.send_message(f'<@{interaction.user.id}>, {settings.messages()}\nЗапрос: ``{len(queuehandler.GlobalQueue.queue)}``{prompt_output}')
+            
+            
+# view that holds the interrupt button for progress
+class ProgressView(View):
+    def __init__(self):
+        super().__init__(timeout=None)
 
+    @discord.ui.button(
+        custom_id="button-interrupt",
+        emoji="❌"
+    )
+    async def interrupt(self, button, interaction):
+        try:
+            if str(interaction.user.id) not in interaction.message.content:
+                await interaction.response.send_message("Я не могу прекратить процесс других людей!", ephemeral=True)
+                return
+            button.disabled = True
+            s = requests.Session()
+            s.post(url=f'{settings.global_var.url}/sdapi/v1/interrupt')
+            await interaction.message.delete()
+        except Exception as e:
+            button.disabled = True
+            await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
+                                                    "где-то "
+                                                    "или у меня в кеше больше нет сообщения.\n"
+                                                    f"Удачи:\n`{str(e)}`", ephemeral=True)
 
 # creating the view that holds the buttons for /draw output
 class DrawView(View):
