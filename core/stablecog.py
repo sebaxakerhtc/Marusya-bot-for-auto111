@@ -203,7 +203,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         if settings.global_var.prompt_ban_list or settings.global_var.prompt_ignore_list or settings.global_var.negative_prompt_prefix:
             mod_results = settings.prompt_mod(simple_prompt, negative_prompt)
             if mod_results[0] == "Stop":
-                await ctx.respond(f"I'm not allowed to draw the word {mod_results[1]}!", ephemeral=True)
+                await ctx.respond(f"Мне не позволено использовать слово {mod_results[1]}!", ephemeral=True)
                 return
             if mod_results[0] == "Mod":
                 if settings.global_var.display_ignored_words == "False":
@@ -306,10 +306,10 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                         reply_adds += f"\nЯ не могу создать столько изображений: ``{requested}``! Зато ``{new_total}`` смогу."
             # check batch values against the maximum limits
             if batch[0] > max_batch[0]:
-                reply_adds += f"\nThe max batch count I'm allowed here is ``{max_batch[0]}``!"
+                reply_adds += f"\nМаксимальное колличество компановок ``{max_batch[0]}``!"
                 batch[0] = max_batch[0]
             if batch[1] > max_batch[1]:
-                reply_adds += f"\nThe max batch size I'm allowed here is ``{max_batch[1]}``!"
+                reply_adds += f"\nМаксимальный размер компановок ``{max_batch[1]}``!"
                 batch[1] = max_batch[1]
                 # add hard limit of 10 images until I can figure how to bypass this discord limit - multi value edition
                 if batch[0] * batch[1] > 10:
@@ -319,7 +319,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                         if batch[1] != 1:
                             batch[1] -= 1
                     reply_adds += f"\nЯ ограничена до 10 произведений искусства в 1 сообщении..."
-            reply_adds += f'\nBatch count: ``{batch[0]}`` - Batch size: ``{batch[1]}``'
+            reply_adds += f'\nКомпановка. Колличество: ``{batch[0]}`` - Размер: ``{batch[1]}``'
         if styles != settings.read(channel)['style']:
             reply_adds += f'\nStyle: ``{styles}``'
         if extra_net is not None and extra_net != 'None':
