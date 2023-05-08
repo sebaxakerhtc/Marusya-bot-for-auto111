@@ -10,10 +10,11 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 
 Для генерации картинки из текста используйте команду /draw и саполните описание запроса.
 
-<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/screenshot.png width=50% height=50%>
+<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/livepreview.png width=50% height=50%>
 
 ### Поддерживаемые функции
 
+- (new!) live preview | генерация в реальном времени
 - negative prompts | нежелательное описание
 - swap model/checkpoint | смена модели (_[see wiki](https://github.com/Kilvoctu/aiyabot/wiki/Model-swapping)_)
 - sampling steps | шаги
