@@ -105,14 +105,14 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         int,
         description='Width of the generated image.',
         required=False,
-        min_value=256,
+        choices=[x for x in settings.global_var.size_range]
     )
     @option(
         'height',
         int,
         description='Height of the generated image.',
         required=False,
-        min_value=256,
+        choices=[x for x in settings.global_var.size_range]
     )
     @option(
         'guidance_scale',
