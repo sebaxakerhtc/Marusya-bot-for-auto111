@@ -8,7 +8,7 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 
 ## Usage
 
-Для генерации картинки из текста используйте команду /draw и саполните описание запроса.
+Для генерации картинки из текста используйте команду /draw и заполните описание запроса.
 
 <img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/livepreview.png width=50% height=50%>
 
