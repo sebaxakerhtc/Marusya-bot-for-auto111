@@ -309,9 +309,8 @@ class ProgressView(View):
                 await interaction.response.send_message("Я не могу прекратить процесс других людей!", ephemeral=True)
                 return
             button.disabled = True
-            s = requests.Session()
+            s = settings.authenticate_user()
             s.post(url=f'{settings.global_var.url}/sdapi/v1/interrupt')
-            await interaction.message.delete()
         except Exception as e:
             button.disabled = True
             await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
