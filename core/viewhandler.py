@@ -310,6 +310,7 @@ class ProgressView(View):
             button.disabled = True
             s = settings.authenticate_user()
             s.post(url=f'{settings.global_var.url}/sdapi/v1/interrupt')
+            await interaction.response.edit_message(view=self)
         except Exception as e:
             button.disabled = True
             await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
@@ -327,6 +328,7 @@ class ProgressView(View):
             button.disabled = True
             s = settings.authenticate_user()
             s.post(url=f'{settings.global_var.url}/sdapi/v1/skip')
+            await interaction.response.edit_message(view=self)
         except Exception as e:
             button.disabled = True
             await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
