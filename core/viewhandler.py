@@ -300,10 +300,9 @@ class ProgressView(View):
         super().__init__(timeout=None)
 
     @discord.ui.button(
-        custom_id="button-interrupt",
-        emoji="❌"
-    )
-    async def interrupt(self, button, interaction):
+        custom_id="button_interrupt",
+        emoji="❌")
+    async def button_interrupt(self, button, interaction):
         try:
             if str(interaction.user.id) not in interaction.message.content:
                 await interaction.response.send_message("Я не могу прекратить процесс других людей!", ephemeral=True)
@@ -311,6 +310,23 @@ class ProgressView(View):
             button.disabled = True
             s = settings.authenticate_user()
             s.post(url=f'{settings.global_var.url}/sdapi/v1/interrupt')
+        except Exception as e:
+            button.disabled = True
+            await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
+                                                    "где-то "
+                                                    "или у меня в кеше больше нет сообщения.\n"
+                                                    f"Удачи:\n`{str(e)}`", ephemeral=True)
+    @discord.ui.button(
+        custom_id="button_skip",
+        emoji="➡️")
+    async def button_skip(self, button, interaction):
+        try:
+            if str(interaction.user.id) not in interaction.message.content:
+                await interaction.response.send_message("Я не могу управлять процессом других людей!", ephemeral=True)
+                return
+            button.disabled = True
+            s = settings.authenticate_user()
+            s.post(url=f'{settings.global_var.url}/sdapi/v1/skip')
         except Exception as e:
             button.disabled = True
             await interaction.response.send_message("Не знаю, почему, но я сломалась. Может быть запрос потерялся "
