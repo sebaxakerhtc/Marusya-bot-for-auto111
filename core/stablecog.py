@@ -12,6 +12,7 @@ from PIL import Image, PngImagePlugin
 from discord import option
 from discord.ext import commands
 from typing import Optional
+from threading import Thread
 
 from core import queuehandler
 from core import viewhandler
@@ -536,6 +537,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             # post to discord
             def post_dream():
                 event_loop.create_task(status_message_task.result().delete())
+            Thread(target=post_dream, daemon=True).start()
                 
             with contextlib.ExitStack() as stack:
                 buffer_handles = [stack.enter_context(io.BytesIO()) for _ in pil_images]
