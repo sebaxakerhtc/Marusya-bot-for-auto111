@@ -60,7 +60,7 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
     except Exception as e:
         print('что-то пошло не так...', str(e))
 
-    time.sleep(1)
+    time.sleep(0.2)
     event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, tries))
 
 class StableCog(commands.Cog, name='Stable Diffusion', description='Create images from natural language.'):
