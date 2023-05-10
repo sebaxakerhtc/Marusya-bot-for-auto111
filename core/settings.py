@@ -103,6 +103,8 @@ class GlobalVar:
     embeddings_1 = []
     embeddings_2 = []
     hyper_names = []
+    script_names_t2i = []
+    script_names_i2i = []
     lora_names = []
     extra_nets = []
     upscaler_names = []
@@ -499,14 +501,15 @@ def populate_global_vars():
     r4 = s.get(global_var.url + "/sdapi/v1/embeddings")
     r5 = s.get(global_var.url + "/sdapi/v1/hypernetworks")
     r6 = s.get(global_var.url + "/sdapi/v1/upscalers")
+    r7 = s.get(global_var.url + "/sdapi/v1/scripts")
     r = s.get(global_var.url + "/sdapi/v1/sd-models")
     for s1 in r1.json():
         try:
             global_var.sampler_names.append(s1['name'])
         except(Exception,):
             # throw in last exception error for anything that wasn't caught earlier
-            print("Can't connect to API for some reason!"
-                  "Please check your .env URL or credentials.")
+            print("Невозможно подключиться к API!"
+                  "Проверьте файл .env, URL или Логин/Пароль.")
             os.system("pause")
     global_var.style_names['None'] = ''
     for s2 in r2.json():
@@ -527,6 +530,10 @@ def populate_global_vars():
         global_var.hyper_names.append(s5['name'])
     for s6 in r6.json():
         global_var.upscaler_names.append(s6['name'])
+    for s7 in r7.json()['txt2img']:
+            global_var.script_names_t2i.append(s7)
+    for s7 in r7.json()['img2img']:
+            global_var.script_names_i2i.append(s7)
     if 'SwinIR_4x' in global_var.upscaler_names:
         template['upscaler_1'] = 'SwinIR_4x'
 

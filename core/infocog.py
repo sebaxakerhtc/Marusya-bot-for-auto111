@@ -180,6 +180,45 @@ class InfoView(View):
         self.page = 0
 
         await interaction.response.edit_message(view=self, embed=self.contents[0])
+        
+    @discord.ui.button(
+        custom_id="button_scripts",
+        label="Scripts", row=1)
+    async def button_scripts(self, _button, interaction):
+        t2i_length = len(settings.global_var.script_names_t2i)
+        i2i_length = len(settings.global_var.script_names_i2i)
+        total_length = t2i_length + i2i_length
+        script_names = settings.global_var.script_names_t2i + settings.global_var.script_names_i2i
+        batch = 16
+        self.page = 0
+        self.contents = []
+        total_pages = math.ceil(t2i_length / (batch * 2)) + math.ceil(i2i_length / (batch * 2))
+        desc = 'Using is in my ToDo list.'
+
+        if total_length > batch * 2:
+            self.enable_nav_buttons()
+        else:
+            self.disable_nav_buttons()
+
+        for i in range(0, total_length, batch * 2):
+            script_column_a, script_column_b = '', ''
+            embed_page = discord.Embed(title="Список скриптов",
+                                       description=f"{desc}\nДоступные скрипты для txt2img и img2img.",
+                                       colour=settings.global_var.embed_color)
+            for value1 in settings.global_var.script_names_t2i[i:i + batch]:
+                script_column_a += f'\n``{value1}``'
+            embed_page.add_field(name='txt2img', value=script_column_a, inline=True)
+            for value2 in settings.global_var.script_names_i2i[i:i + batch]:
+                script_column_b += f'\n``{value2}``'            
+            embed_page.add_field(name='img2img', value=script_column_b, inline=True)
+            i += batch
+            if total_length > batch * 2:
+                embed_page.set_footer(text=f'Page {self.page + 1} of {total_pages} - {total_length} total')
+            self.contents.append(embed_page)
+            self.page += 1    
+        self.page = 0
+
+        await interaction.response.edit_message(view=self, embed=self.contents[0])        
 
     @discord.ui.button(
         custom_id="button_embed",
@@ -286,7 +325,7 @@ class InfoView(View):
                                    "\nПри создании изображения, ИИ будет смешивать word1 и word2. Порядок слов так же важен.",
                               inline=False)
 
-        embed_tips4 = discord.Embed(title="Кнопки", description="Сгенерированные изображения содержат кнопки!",
+        embed_tips4 = discord.Embed(title="Кнопки", description="Изображения содержат кнопки!",
                                     colour=settings.global_var.embed_color)
         embed_tips4.add_field(name="🖋️",
                               value="Эта кнопка вызывает всплывающее окно, позволяющее изменить некоторые параметры и сгенерировать новые изображения с этими изменениями.")
@@ -296,8 +335,12 @@ class InfoView(View):
         embed_tips4.add_field(name="📋",
                               value="Эта кнопка показывает информацию о генерации изображенийи даже позволяет скопировать команду для генерации!")
         embed_tips4.add_field(name="❌",
-                              value="Крест используется для удаления любых нежелательных изображений. Если эта кнопка не работает, вы можете добавить реакцию ❌ вместо этого.")
+                              value="Крест используется для удаления любых нежелательных изображений. Если эта кнопка не работает, вы можете добавить реакцию ❌ вместо этого.\n"
+                                    "В режиме просмотра Live preview эта кнока прекращает генерацию")
+        embed_tips4.add_field(name="➡️",
+                              value="В режиме просмотра Live preview эта кнока пропускает текущую генерацию и преходит к следующей (если их несколько в задании)")                                    
         embed_tips4.add_field(name="\u200B", value="\u200B")
+        
 
         embed_tips5 = discord.Embed(title="Контекстное меню",
                                     description="У вас есть возможность использовать команды из контекстного меню!\n"

@@ -185,6 +185,22 @@ class DrawModal(Modal):
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не распознан. Мне известны следущие сэмплеры!",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.sampler_names]),
                                         inline=False)
+            if 'script_t2i:' in line:
+                if line.split(':', 1)[1] in settings.global_var.script_names_t2i:
+                    pen[9] = line.split(':', 1)[1]
+                else:
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не распознан. Мне известны следущие скрипты!",
+                                        value=', '.join(['`%s`' % x for x in settings.global_var.script_names_t2i]),
+                                        inline=False)     
+            if 'script_i2i:' in line:
+                if line.split(':', 1)[1] in settings.global_var.script_names_t2i:
+                    pen[9] = line.split(':', 1)[1]
+                else:
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` не распознан. Мне известны следущие скрипты!",
+                                        value=', '.join(['`%s`' % x for x in settings.global_var.script_names_i2i]),
+                                        inline=False)                             
             if 'strength:' in line:
                 try:
                     pen[11] = float(line.split(':', 1)[1].replace(",", "."))
