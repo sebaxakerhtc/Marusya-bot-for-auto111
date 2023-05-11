@@ -6,7 +6,7 @@ Discord бот для Stable Diffusion
 
 This fork is for me and my friends. Original project [here](https://github.com/Kilvoctu/aiyabot)!
 
-## Usage
+## Использование
 
 Для генерации картинки из текста используйте команду /draw и заполните описание запроса.
 
@@ -44,17 +44,19 @@ This fork is for me and my friends. Original project [here](https://github.com/K
   - 🖋 - Эта кнопка вызывает всплывающее окно, позволяющее изменить некоторые параметры и сгенерировать новые изображения с этими изменениями.
   - 🎲 - Используйте эту кнопку чтобы сгенерировать другие изображения с теми же параметрами.
   - 📋 - Эта кнопка показывает информацию о генерации изображенийи даже позволяет скопировать команду для генерации!
+  - ➡️ - New! В режиме просмотра Live preview эта кнопка пропускает генерацию (batch) и переходит к следующей
   - ❌ - Крест используется для удаления любых нежелательных изображений. Если эта кнопка не работает, вы можете добавить реакцию ❌ вместо этого.
+  New! В режиме просмотра Live prevew эта же кнопка преращает задание.
 - конткстное меню - попробуйте эти команды на любом сообщении.
-  - Информация - просмотр сведенийоб изображении, сгенерированным в Stable Diffusion.
+  - Информация - просмотр сведений об изображении, сгенерированным в Stable Diffusion.
   - Быстрое увеличение - увеличение изображения без указания настроек.
 - [configuration file](https://github.com/Kilvoctu/aiyabot/wiki/Configuration) - can change some of AIYA's operational aspects. 
 
 
 ## Setup requirements
 
-- Set up [AUTOMATIC1111's Stable Diffusion AI Web UI](https://github.com/AUTOMATIC1111/stable-diffusion-webui).
-- Run the Web UI as local host with API (`COMMANDLINE_ARGS= --api`).
+- Установите [лучший форк AUTOMATIC1111]([https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/vladmandic/automatic)).
+- Запустите интерфейс с доступом к API (`COMMANDLINE_ARGS= --api`).
 - Clone this repo.
 - Create a file in your cloned repo called ".env", formatted like so:
 ```dotenv
@@ -62,34 +64,6 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 TOKEN = put your bot token here
 ```
 - Run AIYA by running launch.bat (or launch.sh for Linux)
-
-## Deploy with Docker
-
-AIYA can be deployed using Docker.
-
-The docker image supports additional configuration by adding environment variables or config file updates detailed in the [wiki](https://github.com/Kilvoctu/aiyabot/wiki/Configuration).
-
-### Docker run
-
-```bash
-docker run --name aiyabot --network=host --restart=always -e TOKEN=your_token_here -e TZ=America/New_York -v ./aiyabot/outputs:/app/outputs -v ./aiyabot/resources:/app/resources -d ghcr.io/kilvoctu/aiyabot:latest
-```
-
-Note the following environment variables work with the docker image:
-
-- `TOKEN` - **[Required]** Discord bot token.
-- `URL` - URL of the Web UI API. Defaults to `http://localhost:7860`.
-- `TZ` - Timezone for the container in the format `America/New_York`. Defaults to `America/New_York`
-- `APIUSER` - API username if required for your Web UI instance.
-- `APIPASS` - API password if required for your Web UI instance.
-- `USER` - Username if required for your Web UI instance.
-- `PASS` - Password if required for your Web UI instance.
-
-### Docker compose
-
-- Clone the repo and refer to the `docker-compose.yml` file in the `deploy` directory.
-- Rename the `/deploy/.env.example` file to `.env` and update the `TOKEN` variable with your bot token (and any other configuration as desired).
-- Run `docker-compose up -d` to start the bot.
 
 ## Notes
 
