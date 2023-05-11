@@ -1,5 +1,7 @@
 # Маруся
 
+### [Looking for English version?](https://github.com/sebaxakerhtc/myaiyabot/tree/main_en)
+
 Discord бот для Stable Diffusion
 
 <img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=40% height=40%>
