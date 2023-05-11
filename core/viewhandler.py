@@ -1,6 +1,7 @@
 import discord
 import random
 import re
+import requests
 from discord.ui import InputText, Modal, View
 
 from core import ctxmenuhandler
@@ -155,7 +156,7 @@ class DrawModal(Modal):
                                         value=f"Keep steps between `0` and `{max_steps}`.", inline=False)
             if 'width:' in line:
                 try:
-                    pen[6] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
+                    pen[6] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` width is no good! These widths I can do.",
@@ -163,7 +164,7 @@ class DrawModal(Modal):
                                         inline=False)
             if 'height:' in line:
                 try:
-                    pen[7] = [x for x in settings.global_var.size_range if x == int(line.split(':', 1)[1])][0]
+                    pen[7] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` height is no good! These heights I can do.",
@@ -184,6 +185,22 @@ class DrawModal(Modal):
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is unrecognized. I know of these samplers!",
                                         value=', '.join(['`%s`' % x for x in settings.global_var.sampler_names]),
                                         inline=False)
+            if 'script_t2i:' in line:
+                if line.split(':', 1)[1] in settings.global_var.script_names_t2i:
+                    pen[9] = line.split(':', 1)[1]
+                else:
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is unrecognized. I know of these scripts!",
+                                        value=', '.join(['`%s`' % x for x in settings.global_var.script_names_t2i]),
+                                        inline=False)     
+            if 'script_i2i:' in line:
+                if line.split(':', 1)[1] in settings.global_var.script_names_t2i:
+                    pen[9] = line.split(':', 1)[1]
+                else:
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is unrecognized. I know of these scripts!",
+                                        value=', '.join(['`%s`' % x for x in settings.global_var.script_names_i2i]),
+                                        inline=False)                                                            
             if 'strength:' in line:
                 try:
                     pen[11] = float(line.split(':', 1)[1].replace(",", "."))
@@ -291,7 +308,49 @@ class DrawModal(Modal):
             else:
                 await queuehandler.process_dream(draw_dream, queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
             await interaction.response.send_message(f'<@{interaction.user.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}``{prompt_output}')
+            
+            
+# view that holds the interrupt button for progress
+class ProgressView(View):
+    def __init__(self):
+        super().__init__(timeout=None)
 
+    @discord.ui.button(
+        custom_id="button_interrupt",
+        emoji="❌")
+    async def button_interrupt(self, button, interaction):
+        try:
+            if str(interaction.user.id) not in interaction.message.content:
+                await interaction.response.send_message("Cannot interrupt other people's tasks!", ephemeral=True)
+                return
+            button.disabled = True
+            s = settings.authenticate_user()
+            s.post(url=f'{settings.global_var.url}/sdapi/v1/interrupt')
+            await interaction.response.edit_message(view=self)
+        except Exception as e:
+            button.disabled = True
+            await interaction.response.send_message("I have no idea why, but I broke. Either the request has fallen "
+                                                    "through "
+                                                    "or I no longer have the message in my cache.\n"
+                                                    f"Good luck:\n`{str(e)}`", ephemeral=True)
+    @discord.ui.button(
+        custom_id="button_skip",
+        emoji="➡️")
+    async def button_skip(self, button, interaction):
+        try:
+            if str(interaction.user.id) not in interaction.message.content:
+                await interaction.response.send_message("Cannot skip other people's tasks!", ephemeral=True)
+                return
+            button.disabled = True
+            s = settings.authenticate_user()
+            s.post(url=f'{settings.global_var.url}/sdapi/v1/skip')
+            await interaction.response.edit_message(view=self)
+        except Exception as e:
+            button.disabled = True
+            await interaction.response.send_message("I have no idea why, but I broke. Either the request has fallen "
+                                                    "through "
+                                                    "or I no longer have the message in my cache.\n"
+                                                    f"Good luck:\n`{str(e)}`", ephemeral=True)
 
 # creating the view that holds the buttons for /draw output
 class DrawView(View):

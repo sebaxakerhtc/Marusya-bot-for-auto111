@@ -180,6 +180,46 @@ class InfoView(View):
         self.page = 0
 
         await interaction.response.edit_message(view=self, embed=self.contents[0])
+        
+    @discord.ui.button(
+        custom_id="button_scripts",
+        label="Scripts", row=1)
+    async def button_scripts(self, _button, interaction):
+        t2i_length = len(settings.global_var.script_names_t2i)
+        i2i_length = len(settings.global_var.script_names_i2i)
+        total_length = t2i_length + i2i_length
+        script_names = settings.global_var.script_names_t2i + settings.global_var.script_names_i2i
+        batch = 16
+        self.page = 0
+        self.contents = []
+        total_pages = math.ceil(t2i_length / (batch * 2)) + math.ceil(i2i_length / (batch * 2))
+        desc = 'Using is in my ToDo list.'
+
+        if total_length > batch * 2:
+            self.enable_nav_buttons()
+        else:
+            self.disable_nav_buttons()
+
+        for i in range(0, total_length, batch * 2):
+            script_column_a, script_column_b = '', ''
+            embed_page = discord.Embed(title="Scripts list",
+                                       description=f"{desc}\nScripts available for txt2img and img2img.",
+                                       colour=settings.global_var.embed_color)
+            for value1 in settings.global_var.script_names_t2i[i:i + batch]:
+                script_column_a += f'\n``{value1}``'
+            embed_page.add_field(name='txt2img', value=script_column_a, inline=True)
+            for value2 in settings.global_var.script_names_i2i[i:i + batch]:
+                script_column_b += f'\n``{value2}``'            
+            embed_page.add_field(name='img2img', value=script_column_b, inline=True)
+            i += batch
+            if total_length > batch * 2:
+                embed_page.set_footer(text=f'Page {self.page + 1} of {total_pages} - {total_length} total')
+            self.contents.append(embed_page)
+            self.page += 1    
+        self.page = 0
+
+        await interaction.response.edit_message(view=self, embed=self.contents[0])        
+                    
 
     @discord.ui.button(
         custom_id="button_embed",
@@ -296,7 +336,10 @@ class InfoView(View):
         embed_tips4.add_field(name="📋",
                               value="The clipboard provides the information used to make the image, and even provides the command for copying!")
         embed_tips4.add_field(name="❌",
-                              value="The button used to delete any unwanted outputs. If this button isn't working, you can add a ❌ reaction instead.")
+                              value="The button used to delete any unwanted outputs. If this button isn't working, you can add a ❌ reaction instead.\n"
+                                    "New! In Live preview this button interrupts generation process")
+        embed_tips4.add_field(name="➡️",
+                              value="New! In Live preview this button skips the current image generation and go to next batch (if there's more than 1)")                                                                                                           
         embed_tips4.add_field(name="\u200B", value="\u200B")
 
         embed_tips5 = discord.Embed(title="Context menu",
@@ -307,11 +350,11 @@ class InfoView(View):
         # For those who fork AIYA, feel free to edit or add to this per your needs,
         # but please don't just delete me from credits and claim my work as yours.
         url = 'https://github.com/Kilvoctu/aiyabot'
-        thumb = 'https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/previewthumb.png'
+        thumb = 'https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D0%B5%D0%BD%D1%8C%D0%BA%D0%B0.png'
         wiki = 'https://github.com/Kilvoctu/aiyabot/wiki#using-aiya'
         embed_tips6 = discord.Embed(title="Extra Information",
                                     description=f"For more detailed documentation, check out the [wiki]({wiki}) in my [home]({url})!\n\n"
-                                                f"Also, feel free to report bugs or leave feedback! I'm open-source Python Discord bot AIYA, developed by *Kilvoctu#1238*, maintained with care."
+                                                f"Also, feel free to report bugs or leave feedback! I'm open-source Python Discord bot MaRussia, developed by *Kilvoctu#1238*, maintained with care. Modded by *sebaxakerhtc*"
                                                 f"\n\nPlease enjoy making AI art with me~!",
                                     colour=settings.global_var.embed_color)
         embed_tips6.set_thumbnail(url=thumb)

@@ -109,6 +109,20 @@ class SettingsCog(commands.Cog):
         description='Set default sampler for the channel',
         required=False,
         choices=settings.global_var.sampler_names,
+    )        
+    @option(
+        'script_t2i',
+        str,
+        description='text2image Script',
+        required=False,
+        choices=settings.global_var.script_names_t2i,        
+    )
+    @option(
+        'script_i2i',
+        str,
+        description='image2image Script',
+        required=False,
+        choices=settings.global_var.script_names_i2i,                                                    
     )
     @option(
         'styles',
@@ -238,6 +252,8 @@ class SettingsCog(commands.Cog):
             settings.global_var.sampler_names.clear()
             settings.global_var.facefix_models.clear()
             settings.global_var.style_names.clear()
+            settings.global_var.script_names_t2i.clear()
+            settings.global_var.script_names_i2i.clear()                                       
             settings.global_var.embeddings_1.clear()
             settings.global_var.embeddings_2.clear()
             settings.global_var.hyper_names.clear()
