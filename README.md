@@ -53,9 +53,9 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 - [configuration file](https://github.com/Kilvoctu/aiyabot/wiki/Configuration) - can change some of AIYA's operational aspects. 
 
 
-## Setup requirements
+## Установка
 
-- Установите [лучший форк AUTOMATIC1111]([https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/vladmandic/automatic)).
+- Установите [лучший форк AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/vladmandic/automatic).
 - Запустите интерфейс с доступом к API (`COMMANDLINE_ARGS= --api`).
 - Clone this repo.
 - Create a file in your cloned repo called ".env", formatted like so:
