@@ -156,7 +156,7 @@ class DrawModal(Modal):
                                         value=f"Шаги должны быть между `0` и `{max_steps}`.", inline=False)
             if 'width:' in line:
                 try:
-                    pen[6] = [x for x in max_size if x == int(line.split(':', 1)[1])][0]
+                    pen[6] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая ширина! Вот ширина, которая может быть.",
@@ -164,7 +164,7 @@ class DrawModal(Modal):
                                         inline=False)
             if 'height:' in line:
                 try:
-                    pen[7] = [x for x in max_size if x == int(line.split(':', 1)[1])][0]
+                    pen[7] = int(line.split(':', 1)[1])
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` неподходящая высота! Вот высота, которая может быть.",
