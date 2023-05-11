@@ -2,13 +2,13 @@
 ### [Ищете Русскую версию?](https://github.com/sebaxakerhtc/myaiyabot)
 A Discord bot interface for Stable Diffusion
 
-<img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=30% height=30%>
+<img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=40% height=40%>
 
 ## Usage
 
 To generate an image from text, use the /draw command and include your prompt as the query.
 
-<img src=https://sebaxakerhtc.github.io/images/live_preview_en.png width=50% height=50%>
+<img src=https://sebaxakerhtc.github.io/images/live_preview_en.png width=40% height=40%>
 
 ### Currently supported options
 
