@@ -1,5 +1,5 @@
 # Marusya
-
+### [Ищете Русскую версию?](https://github.com/sebaxakerhtc/myaiyabot)
 A Discord bot interface for Stable Diffusion
 
 <img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=30% height=30%>
@@ -54,7 +54,7 @@ To generate an image from text, use the /draw command and include your prompt as
 
 - Set up [AUTOMATIC1111's best fork](https://github.com/vladmandic/automatic).
 - Run the Web UI as local host with API (`COMMANDLINE_ARGS= --api`).
-- Clone this repo.
+- Clone this repo using `git clone -b main_en https://github.com/sebaxakerhtc/myaiyabot`
 - Create a file in your cloned repo called ".env", formatted like so:
 ```dotenv
 # .env
