@@ -2,7 +2,7 @@
 
 Discord бот для Stable Diffusion
 
-<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=30% height=30%>
+<img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=40% height=40%>
 
 This fork is for me and my friends. Original project [here](https://github.com/Kilvoctu/aiyabot)!
 
@@ -10,7 +10,7 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 
 Для генерации картинки из текста используйте команду /draw и заполните описание запроса.
 
-<img src=https://github.com/sebaxakerhtc/sebaxakerhtc.github.io/raw/master/images/livepreview.png width=50% height=50%>
+<img src=https://sebaxakerhtc.github.io/images/live_preview.png width=40% height=40%>
 
 ### Поддерживаемые функции
 
