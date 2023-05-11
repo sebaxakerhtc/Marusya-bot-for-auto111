@@ -55,28 +55,29 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 
 ## Установка
 
-- Установите [лучший форк AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui](https://github.com/vladmandic/automatic).
+- Установите [лучший форк AUTOMATIC1111](https://github.com/vladmandic/automatic).
 - Запустите интерфейс с доступом к API (`COMMANDLINE_ARGS= --api`).
-- Clone this repo.
-- Create a file in your cloned repo called ".env", formatted like so:
+- Склонируйте этот репозиторий.
+- Создайте в клонированном репозитории файл ".env" и заполните так:
 ```dotenv
 # .env
 TOKEN = put your bot token here
 ```
-- Run AIYA by running launch.bat (or launch.sh for Linux)
+- Запустите Марусю используя launch.bat (или launch.sh для Linux)
 
-## Notes
+## Заметки
 
-- [See wiki for notes on additional configuration.](https://github.com/Kilvoctu/aiyabot/wiki/Configuration)
-- [See wiki for notes on swapping models.](https://github.com/Kilvoctu/aiyabot/wiki/Model-swapping)
-- Ensure AIYA has `bot` and `application.commands` scopes when inviting to your Discord server, and intents are enabled.
-- As /settings can be abused, consider reviewing who can access the command. This can be done through Apps -> Integrations in your Server Settings. Read more about /settings [here.](https://github.com/Kilvoctu/aiyabot/wiki/settings-command)
-- AIYA uses Web UI's legacy high-res fix method. To ensure this works correctly, in your Web UI settings, enable this option: `For hires fix, use width/height sliders to set final resolution rather than first pass`
+- [Дополнительная настройка (English).](https://github.com/Kilvoctu/aiyabot/wiki/Configuration)
+- [Переключение моделей (English).](https://github.com/Kilvoctu/aiyabot/wiki/Model-swapping)
+- Убедитесь, что Маруся имеет `bot`, `application.commands` и необходимые разрешения, приглашая её в свой Discord сервер.
+- Так как командой /settings можно злоупотреблять - проверьте, кто может использовать эту команду. Перейдите в Apps -> Integrations в настройках сервера. Подробнее о /settings [здесь.(English)](https://github.com/Kilvoctu/aiyabot/wiki/settings-command)
+- Маруся использует устаревший high-res fix из Web UI. Чтоб он работал правильно, в настройках Web UI включите опцию: `For hires fix, use width/height sliders to set final resolution rather than first pass`
 
 
-## Credits
+## Credits (original)
 
 AIYA only exists thanks to these awesome people:
+- [Original project](https://github.com/Kilvoctu/aiyabot) - it's from me!
 - AUTOMATIC1111, and all the contributors to the Web UI repo.
   - https://github.com/AUTOMATIC1111/stable-diffusion-webui
 - harubaru, my entryway into Stable Diffusion (with Waifu Diffusion) and foundation for the AIYA Discord bot.
