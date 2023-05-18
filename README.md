@@ -52,7 +52,7 @@ To generate an image from text, use the /draw command and include your prompt as
 
 ## Setup requirements
 
-- Set up [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) or [AUTOMATIC1111's fork](https://github.com/vladmandic/automatic).
+- Set up [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) or [its best fork](https://github.com/vladmandic/automatic).
 - Run the Web UI as local host with API (`COMMANDLINE_ARGS= --api`).
 - Clone this repo using `git clone -b main_en https://github.com/sebaxakerhtc/myaiyabot`
 - Create a file in your cloned repo called ".env", formatted like so:
