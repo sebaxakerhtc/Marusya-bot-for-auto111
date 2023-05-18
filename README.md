@@ -57,7 +57,7 @@ This fork is for me and my friends. Original project [here](https://github.com/K
 
 ## Установка
 
-- Установите [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) или его [форк](https://github.com/vladmandic/automatic).
+- Установите [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) или его [лучший форк](https://github.com/vladmandic/automatic).
 - Запустите интерфейс с доступом к API (`COMMANDLINE_ARGS= --api`).
 - Склонируйте этот репозиторий.
 - Создайте в клонированном репозитории файл ".env" и заполните так:
