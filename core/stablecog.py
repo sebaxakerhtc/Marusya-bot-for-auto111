@@ -173,6 +173,13 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         str,
         description='The amount in which init_image will be altered (0.0 to 1.0).'
     )
+    
+    @option(
+        'resize_mode',
+        str,
+        description='Resize mode (0, 1, 2, 3, 4).'
+    )
+    
     @option(
         'init_image',
         discord.Attachment,
@@ -205,6 +212,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                             highres_fix: Optional[str] = None,
                             clip_skip: Optional[int] = None,
                             strength: Optional[str] = None,
+                            resize_mode: Optional[str] = None,
                             init_image: Optional[discord.Attachment] = None,
                             init_url: Optional[str],
                             batch: Optional[str] = None):
@@ -234,6 +242,8 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             clip_skip = settings.read(channel)['clip_skip']
         if strength is None:
             strength = settings.read(channel)['strength']
+        if resize_mode is None:
+            resize_mode = settings.read(channel)['resize_mode']
         if batch is None:
             batch = settings.read(channel)['batch']
 
@@ -289,7 +299,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
         # verify values and format aiya initial reply
         reply_adds = ''
-        if (width != 512) or (height != 512):
+        if (width != 768) or (height != 768):
             reply_adds += f' - Size: ``{width}``x``{height}``'
         reply_adds += f' - Seed: ``{seed}``'
 
@@ -379,7 +389,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         # set up tuple of parameters to pass into the Discord view
         input_tuple = (
             ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler, seed, strength,
-            init_image, batch, styles, facefix, highres_fix, clip_skip, extra_net)
+            resize_mode, init_image, batch, styles, facefix, highres_fix, clip_skip, extra_net)
         view = viewhandler.DrawView(input_tuple)
         # setup the queue
         user_queue_limit = settings.queue_check(ctx.author)
@@ -442,6 +452,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                 "seed_resize_from_h": 0,
                 "seed_resize_from_w": 0,
                 "denoising_strength": None,
+                "resize_mode": None,
                 "n_iter": queue_object.batch[0],
                 "batch_size": queue_object.batch[1],
                 "styles": [
@@ -456,7 +467,8 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                     "init_images": [
                         'data:image/png;base64,' + image
                     ],
-                    "denoising_strength": queue_object.strength
+                    "denoising_strength": queue_object.strength,
+                    "resize_mode": queue_object.resize_mode
                 }
                 payload.update(img_payload)
 

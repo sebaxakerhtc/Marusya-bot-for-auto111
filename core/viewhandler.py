@@ -31,10 +31,11 @@ input_tuple[0] = ctx
 [16] = highres_fix
 [17] = clip_skip
 [18] = extra_net
+[19] = resize_mode
 '''
 tuple_names = ['ctx', 'simple_prompt', 'prompt', 'negative_prompt', 'data_model', 'steps', 'width', 'height',
                'guidance_scale', 'sampler', 'seed', 'strength', 'init_image', 'batch', 'styles', 'facefix',
-               'highres_fix', 'clip_skip', 'extra_net']
+               'highres_fix', 'clip_skip', 'extra_net', 'resize_mode']
 
 
 # the modal that is used for the 🖋 button
@@ -209,6 +210,14 @@ class DrawModal(Modal):
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for strength!.",
                                         value='Make sure you enter a number (preferably between 0.0 and 1.0).',
                                         inline=False)
+            if 'resize_mode:' in line:
+                try:
+                    pen[19] = int(line.split(':', 1)[1])
+                except(Exception,):
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for resize_mode!.",
+                                        value='Make sure you enter a number (preferably between 0 and 4).',
+                                        inline=False)                            
             if 'styles:' in line:
                 if line.split(':', 1)[1] in settings.global_var.style_names.keys():
                     pen[14] = line.split(':', 1)[1]

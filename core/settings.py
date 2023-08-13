@@ -42,7 +42,7 @@ queue_limit = 5
 batch_buttons = "True"
 
 # The maximum value allowed for width/height (keep as multiple of 64)
-max_size = 1280
+max_size = 2048
 
 # The resize amount when using context menu Quick Upscale
 quick_upscale_resize = 2.0
@@ -79,6 +79,7 @@ strength = "0.75"
 batch = "1,4"
 max_batch = "5,5"
 upscaler_1 = "ESRGAN_4x"
+resize_mode = "1"
 """
 
 
@@ -96,7 +97,7 @@ class GlobalVar:
     api_user: Optional[str] = None
     api_pass: Optional[str] = None
     model_info = {}
-    size_range = range(512, 1312, 32)
+    size_range = range(768, 2212, 64)
     sampler_names = []
     style_names = {}
     facefix_models = []
@@ -270,6 +271,7 @@ def generate_template(template_pop, config):
     template_pop['lora'] = config['lora']
     template_pop['lora_multi'] = config['lora_multi']
     template_pop['strength'] = config['strength']
+    template_pop['resize_mode'] = config['resize_mode']
     template_pop['batch'] = config['batch']
     template_pop['max_batch'] = config['max_batch']
     template_pop['upscaler_1'] = config['upscaler_1']
@@ -489,7 +491,7 @@ def populate_global_vars():
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
     # slash command doesn't update this dynamically. Changes to size need a restart.
-    global_var.size_range = range(512, config['max_size'] + 32, 32)
+    global_var.size_range = range(768, config['max_size'] + 64, 64)
 
     # create persistent session since we'll need to do a few API calls
     s = authenticate_user()

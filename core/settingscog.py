@@ -172,6 +172,11 @@ class SettingsCog(commands.Cog):
         description='Set default strength (for init_img) for the channel (0.0 to 1.0).'
     )
     @option(
+        'resize_mode',
+        str,
+        description='Resize mode (0, 1, 2, 3, 4).'
+    )
+    @option(
         'batch',
         str,
         description='Set default batch for the channel (count,size)',
@@ -212,6 +217,7 @@ class SettingsCog(commands.Cog):
                                highres_fix: Optional[str] = None,
                                clip_skip: Optional[int] = None,
                                strength: Optional[str] = None,
+                               resize_mode: Optional[str] = None,
                                batch: Optional[str] = None,
                                max_batch: Optional[str] = None,
                                upscaler_1: Optional[str] = None,
@@ -354,6 +360,11 @@ class SettingsCog(commands.Cog):
         if strength is not None:
             settings.update(channel, 'strength', strength)
             new += f'\nStrength: ``"{strength}"``'
+            set_new = True
+        
+        if resize_mode is not None:
+            settings.update(channel, 'resize_mode', resize_mode)
+            new += f'\nresize_mode: ``"{resize_mode}"``'
             set_new = True
 
         if upscaler_1 is not None:

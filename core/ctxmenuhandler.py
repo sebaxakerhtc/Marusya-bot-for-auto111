@@ -69,7 +69,7 @@ async def parse_image_info(ctx, image_url, command):
         # initialize extra params
         steps, size, guidance_scale, sampler, seed = '', '', '', '', ''
         style, facefix, highres_fix, clip_skip = '', '', '', ''
-        strength, has_init_url = '', False
+        strength, resize_mode, has_init_url = '', '', False
         if command == 'button' and ctx is not None:
             has_init_url = True
 
@@ -118,6 +118,8 @@ async def parse_image_info(ctx, image_url, command):
 
             if 'Denoising strength: ' in line:
                 strength = line.split(': ', 1)[1]
+            if 'resize_mode: ' in line:
+                resize_mode = line.split(': ', 1)[1]
 
         width_height = size.split("x")
 
@@ -188,7 +190,7 @@ async def parse_image_info(ctx, image_url, command):
 
         if has_init_url:
             # not interested in adding embed fields for strength and init_image
-            copy_command += f' strength:{strength} init_url:{str(ctx)}'
+            copy_command += f' resize_mode:{resize_mode} strength:{strength} init_url:{str(ctx)}'
 
         embed.add_field(name=f'Command for copying', value=f'', inline=False)
         embed.set_footer(text=copy_command)

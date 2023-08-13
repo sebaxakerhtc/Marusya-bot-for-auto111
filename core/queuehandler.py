@@ -5,8 +5,8 @@ from threading import Thread
 # the queue object for txt2image and img2img
 class DrawObject:
     def __init__(self, cog, ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height,
-                 guidance_scale, sampler, seed, strength, init_image, batch, styles, facefix, highres_fix,
-                 clip_skip, extra_net, view):
+                 guidance_scale, sampler, seed, strength, resize_mode, init_image, batch, styles, facefix,
+                 highres_fix, clip_skip, extra_net, view):
         self.cog = cog
         self.ctx = ctx
         self.simple_prompt = simple_prompt
@@ -20,6 +20,7 @@ class DrawObject:
         self.sampler = sampler
         self.seed = seed
         self.strength = strength
+        self.resize_mode = resize_mode
         self.init_image = init_image
         self.batch = batch
         self.styles = styles
