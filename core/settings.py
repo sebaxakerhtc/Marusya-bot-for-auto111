@@ -63,9 +63,9 @@ negative_prompt = ""
 data_model = ""
 steps = 30
 max_steps = 80
-width = 640
-height = 640
-guidance_scale = "7.0"
+width = 832
+height = 1216
+guidance_scale = "8.0"
 sampler = "DPM++ 2M Karras"
 style = "None"
 facefix = "None"
@@ -96,7 +96,7 @@ class GlobalVar:
     api_user: Optional[str] = None
     api_pass: Optional[str] = None
     model_info = {}
-    size_range = range(512, 1312, 32)
+    size_range = range(768, 1312, 64)
     sampler_names = []
     style_names = {}
     facefix_models = []
@@ -489,7 +489,7 @@ def populate_global_vars():
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
     # slash command doesn't update this dynamically. Changes to size need a restart.
-    global_var.size_range = range(512, config['max_size'] + 32, 32)
+    global_var.size_range = range(768, config['max_size'] + 64, 64)
 
     # create persistent session since we'll need to do a few API calls
     s = authenticate_user()
