@@ -1,18 +1,17 @@
-# AIYA
-
+# Marusya
 A Discord bot interface for Stable Diffusion
 
-<img src=https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/preview.png  width=50% height=50%>
+<img src=https://sebaxakerhtc.github.io/images/%D0%9C%D0%B0%D1%80%D1%83%D1%81%D1%8F.png  width=40% height=40%>
 
 ## Usage
 
 To generate an image from text, use the /draw command and include your prompt as the query.
 
-<img src=https://raw.githubusercontent.com/Kilvoctu/kilvoctu.github.io/master/pics/preview2.png>
+<img src=https://sebaxakerhtc.github.io/images/live_preview_en.png width=40% height=40%>
 
 To generate a prompt from a couple of words, use the /generate command and include your text as the query.
 
-![image](https://github.com/wizz13150/aiyabot/assets/22177081/20c34f36-1b7d-412b-8e53-4e4b25562167)
+<img src=https://sebaxakerhtc.github.io/images/generate.png width=50% height=50%>
 
 
 ### Currently supported options
