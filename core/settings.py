@@ -36,19 +36,19 @@ save_outputs = "True"
 dir = "outputs"
 
 # The limit of tasks a user can have waiting in queue (at least 1)
-queue_limit = 1
+queue_limit = 5
 
 # Whether or not buttons keep generating in batches ("True"/"False")
-batch_buttons = "False"
+batch_buttons = "True"
 
 # Whether or not buttons are restricted to user who requested image ("True"/"False")
 restrict_buttons = "True"
 
 # The maximum value allowed for width/height (keep as multiple of 64)
-max_size = 1024
+max_size = 2048
 
 # The resize amount when using context menu Quick Upscale
-quick_upscale_resize = 2.0
+quick_upscale_resize = 1.5
 
 # AIYA won't generate if prompt has any words in the ban list
 # Separate with commas; example, ["a", "b", "c"]
@@ -66,10 +66,10 @@ negative_prompt = ""
 data_model = ""
 steps = 30
 max_steps = 50
-width = 512
-height = 512
-guidance_scale = "7.0"
-sampler = "Euler a"
+width = 768
+height = 1024
+guidance_scale = "8.0"
+sampler = "DPM++ 2M Karras"
 style = "None"
 facefix = "None"
 highres_fix = "Disabled"
@@ -79,8 +79,8 @@ hyper_multi = "0.85"
 lora = "None"
 lora_multi = "0.85"
 strength = "0.75"
-batch = "1,1"
-max_batch = "1,1"
+batch = "1,4"
+max_batch = "8,8"
 upscaler_1 = "ESRGAN_4x"
 """
 
@@ -99,7 +99,7 @@ class GlobalVar:
     api_user: Optional[str] = None
     api_pass: Optional[str] = None
     model_info = {}
-    size_range = range(192, 1088, 64)
+    size_range = range(768, 2112, 64)
     size_range_exceed = None
     sampler_names = []
     style_names = {}
@@ -493,7 +493,7 @@ def populate_global_vars():
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
     # slash command doesn't update this dynamically. Changes to size need a restart.
-    global_var.size_range = range(192, config['max_size'] + 64, 64)
+    global_var.size_range = range(768, config['max_size'] + 64, 64)
     if len(global_var.size_range) > 25:
         global_var.size_range_exceed = [x for x in global_var.size_range]
         global_var.size_range = []
