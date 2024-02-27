@@ -564,6 +564,7 @@ def populate_global_vars():
         'username': global_var.username,
         'password': global_var.password
     }
+    s.post(global_var.url + '/login', data=login_payload)
     config_url = s.get(global_var.url + "/config")
     old_config = config_url.json()
     try:
