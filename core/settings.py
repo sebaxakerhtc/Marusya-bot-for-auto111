@@ -560,6 +560,10 @@ def populate_global_vars():
         global_var.model_info[row[0]] = '', '', '', ''
 
     # iterate through config for anything unobtainable from API
+    login_payload = {
+        'username': global_var.username,
+        'password': global_var.password
+    }
     config_url = s.get(global_var.url + "/config")
     old_config = config_url.json()
     try:
