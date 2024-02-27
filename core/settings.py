@@ -68,7 +68,7 @@ steps = 30
 max_steps = 50
 width = 768
 height = 1024
-guidance_scale = "8.0"
+guidance_scale = "7.0"
 sampler = "DPM++ 2M Karras"
 style = "None"
 facefix = "None"
@@ -99,7 +99,7 @@ class GlobalVar:
     api_user: Optional[str] = None
     api_pass: Optional[str] = None
     model_info = {}
-    size_range = range(768, 2112, 64)
+    size_range = range(512, 2112, 64)
     size_range_exceed = None
     sampler_names = []
     style_names = {}
@@ -493,7 +493,7 @@ def populate_global_vars():
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
     # slash command doesn't update this dynamically. Changes to size need a restart.
-    global_var.size_range = range(768, config['max_size'] + 64, 64)
+    global_var.size_range = range(512, config['max_size'] + 64, 64)
     if len(global_var.size_range) > 25:
         global_var.size_range_exceed = [x for x in global_var.size_range]
         global_var.size_range = []
