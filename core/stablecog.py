@@ -49,7 +49,7 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
                     f'**Prompt**: `{queue_object.prompt}`\n**Progress**: {round(progress_data.get("progress") * 100, 2)}% '
                     f'\n{progress_data.get("state").get("sampling_step")}/{queue_object.steps} iterations, '
                     f'~{ips} it/s'
-                    f'\n**ETA**: {round(progress_data.get("eta_relative"), 2)} seconds',
+                    f'\n**Relative ETA**: {round(progress_data.get("eta_relative"), 2)} seconds',
             files=[file], view=view)
     except Exception as e:
         print('Something goes wrong...', str(e))
@@ -401,10 +401,10 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
             start_time = time.time()
             
             status_message_task = event_loop.create_task(queue_object.ctx.channel.send(
-                f'**Автор**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
-                f'**Описание**: `{queue_object.prompt}`\n**Прогресс**: Инициализация...'
-                f'\n0/{queue_object.steps} итеракций, 0.00 итеракций в секунду'
-                f'\n**Осталось**: Инициализация...'))
+                f'**Author**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
+                f'**Prompt**: `{queue_object.prompt}`\n**Progress**: Initialization...'
+                f'\n0/{queue_object.steps} iteractions, 0.00 it/s'
+                f'\n**Relative ETA**: Initialization...'))
 
             def worker():
                 event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, 0))
