@@ -38,7 +38,11 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
             buffer = stack.enter_context(io.BytesIO())
             image.save(buffer, 'PNG')
             buffer.seek(0)
-            file = discord.File(fp=buffer, filename=f'{queue_object.seed}.png')
+            filename=f'{queue_object.seed}.png'
+            if queue_object.spoiler:
+                filename=f'SPOILER_{queue_object.seed}.png'
+            fp=buffer
+            file = discord.File(fp, filename)
 
         ips = round((int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
 
