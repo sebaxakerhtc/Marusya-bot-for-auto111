@@ -44,7 +44,9 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
             fp=buffer
             file = discord.File(fp, filename)
 
-        ips = round((int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
+        ips = '?'
+        if progress_data["eta_relative"] != 0:
+            ips = round((int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
 
         view = viewhandler.ProgressView()
 
