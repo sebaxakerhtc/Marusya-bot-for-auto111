@@ -594,61 +594,6 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
             view = queue_object.view
 
-            if batch == True:
-                current_grid = 0
-                grid_index = 0
-                for grid_image in images:
-                    if grid_index >= grid_count:
-                        grid_index = 0
-                        current_grid += 1
-
-                    if current_grid < num_grids - 1 or last_grid_count == 0:
-                        grid_y, grid_x = divmod(grid_index, grid_cols)
-                        grid_x *= queue_object.width
-                        grid_y *= queue_object.height
-                    else:
-                        grid_y, grid_x = divmod(grid_index, last_grid_cols)
-                        grid_x *= queue_object.width
-                        grid_y *= queue_object.height
-
-                    grids[current_grid].paste(grid_image[0], (grid_x, grid_y))
-                    grid_index += 1
-
-                
-                current_grid = 0
-                for grid in grids:
-                    if current_grid < num_grids -1 or last_grid_count == 0:
-                        id_start = current_grid * grid_count + 1
-                        id_end = id_start + grid_count - 1
-                    else:
-                        id_start = current_grid * grid_count + 1
-                        id_end = id_start + last_grid_count - 1
-                    filename=f'{queue_object.seed}-{current_grid}.png'
-                    if queue_object.spoiler:
-                        filename=f'SPOILER_{queue_object.seed}-{count}.png'
-                    file = add_metadata_to_image(grid,images[current_grid * 25][2], filename)
-                    if current_grid == 0:
-                        content = f'<@{queue_object.ctx.author.id}>, {message}\n Batch ID: {epoch_time}-{queue_object.seed}\n Image IDs: {id_start}-{id_end}'
-                    else:
-                        content = f'> for {queue_object.ctx.author.name}, use /info or context menu to retrieve.\n Batch ID: {epoch_time}-{queue_object.seed}\n Image IDs: {id_start}-{id_end}'
-                        view = None
-                        
-                    current_grid += 1
-                    # post discord message
-                    queuehandler.process_post(
-                        self, queuehandler.PostObject(
-                            self, queue_object.ctx, content=content, file=file, embed='', view=view))
-            
-            else:
-                content = f'<@{queue_object.ctx.author.id}>, {message}'
-                filename=f'{queue_object.seed}-{count}.png'
-                if queue_object.spoiler:
-                    filename=f'SPOILER_{queue_object.seed}-{count}.png'
-                file = add_metadata_to_image(image,str_parameters, filename)
-                queuehandler.process_post(
-                    self, queuehandler.PostObject(
-                        self, queue_object.ctx, content=content, file=file, embed='', view=view))
-
         except KeyError as e:
             embed = discord.Embed(title='txt2img failed', description=f'An invalid parameter was found!\n{e}',
                                   color=settings.global_var.embed_color)
