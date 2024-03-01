@@ -348,16 +348,6 @@ class DrawView(View):
     def __init__(self, input_tuple):
         super().__init__(timeout=None)
         self.input_tuple = input_tuple
-        if isinstance(self.input_tuple, tuple): # only check batch if we are actually a real view
-            batch = input_tuple[13]
-            batch_count = batch[0] * batch[1]
-            if batch_count > 1:
-                download_menu = DownloadMenu(input_tuple[19], input_tuple[10], batch_count, input_tuple)
-                download_menu.callback = download_menu.callback
-                self.add_item(download_menu)
-                upscale_menu = UpscaleMenu(input_tuple[19], input_tuple[10], batch_count, input_tuple)
-                upscale_menu.callback = upscale_menu.callback
-                self.add_item(upscale_menu)
 
     # the 🖋 button will allow a new prompt and keep same parameters for everything else
     @discord.ui.button(

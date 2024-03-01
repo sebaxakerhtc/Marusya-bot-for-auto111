@@ -577,6 +577,9 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
                 files = [discord.File(fp=buffer, filename=f'{queue_object.seed}-{i}.png') for (i, buffer) in
                          enumerate(buffer_handles)]
+                if queue_object.spoiler:
+                    files = [discord.File(fp=buffer, filename=f'SPOILER_{queue_object.seed}-{i}.png') for (i, buffer) in
+                         enumerate(buffer_handles)]
                 queuehandler.process_post(
                     self, queuehandler.PostObject(
                         self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>, {message}', file='',
