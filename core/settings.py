@@ -60,7 +60,7 @@ display_ignored_words = "False"
 # These words will be added to the beginning of the negative prompt
 negative_prompt_prefix = []
 # the time, in seconds, between when AIYA checks for generation progress from SD -- can be a float
-preview_update_interval = 1
+preview_update_interval = 0.5
 
 
 # the fallback channel defaults template for AIYA if nothing is set
@@ -127,7 +127,7 @@ class GlobalVar:
     negative_prompt_prefix = []
     spoiler = False
     spoiler_role = None
-    preview_update_interval = 1
+    preview_update_interval = 0.5
 
 
 global_var = GlobalVar()
