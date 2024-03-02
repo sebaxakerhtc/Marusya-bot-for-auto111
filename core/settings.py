@@ -59,6 +59,8 @@ prompt_ignore_list = []
 display_ignored_words = "False"
 # These words will be added to the beginning of the negative prompt
 negative_prompt_prefix = []
+# the time, in seconds, between when AIYA checks for generation progress from SD -- can be a float
+preview_update_interval = 0.5
 
 
 # the fallback channel defaults template for AIYA if nothing is set
@@ -125,6 +127,7 @@ class GlobalVar:
     negative_prompt_prefix = []
     spoiler = False
     spoiler_role = None
+    preview_update_interval = 0.5
 
 
 global_var = GlobalVar()
@@ -505,6 +508,8 @@ def populate_global_vars():
     global_var.prompt_ignore_list = [x for x in config['prompt_ignore_list']]
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
+    if config['preview_update_interval'] is not None:
+        global_var.preview_update_interval = float(config['preview_update_interval'])
     # slash command doesn't update this dynamically. Changes to size need a restart.
     global_var.size_range = range(512, config['max_size'] + 64, 64)
     if len(global_var.size_range) > 25:
