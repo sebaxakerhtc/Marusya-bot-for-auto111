@@ -84,7 +84,8 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
         elif last_file is not None:
             if debug_progress:
                 print('updating progress => No preview image in progress data, but had last_file')
-            file = discord.File(last_file['buffer'], last_file['buffer'])
+            last_file['buffer'].seek(0)
+            file = discord.File(last_file['buffer'], last_file['name'])
         elif debug_progress:
             print('updating progress => No preview or last_image')
 
