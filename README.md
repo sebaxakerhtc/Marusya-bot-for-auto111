@@ -98,4 +98,6 @@ Marusya only exists thanks to these awesome people:
   - https://github.com/harubaru/discord-stable-diffusion
 - Kilvoctu, for making the main repo
   - https://github.com/Kilvoctu/aiyabot
+- FoxxMD, for Live preview optimizations
+  - https://github.com/FoxxMD
 - You, for using Marusya and contributing with PRs, bug reports, feedback, and more!  
