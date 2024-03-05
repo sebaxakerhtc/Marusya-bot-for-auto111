@@ -60,7 +60,7 @@ display_ignored_words = "False"
 # These words will be added to the beginning of the negative prompt
 negative_prompt_prefix = []
 # the time, in seconds, between when AIYA checks for generation progress from SD -- can be a float
-preview_update_interval = 1
+live_preview_update_interval = 1
 
 
 # the fallback channel defaults template for AIYA if nothing is set
@@ -71,7 +71,7 @@ max_steps = 50
 width = 768
 height = 1024
 guidance_scale = "7.0"
-sampler = "DPM++ 2M Karras"
+sampler = "DPM++ SDE"
 style = "None"
 facefix = "None"
 highres_fix = "Disabled"
@@ -82,11 +82,12 @@ lora = "None"
 lora_multi = "0.85"
 strength = "0.75"
 batch = "1,4"
-max_batch = "8,8"
+max_batch = "1,4"
 upscaler_1 = "ESRGAN_4x"
 spoiler = false
 # role ID (not name)
 spoiler_role = ""
+live_preview = true
 """
 
 
@@ -286,6 +287,7 @@ def generate_template(template_pop, config):
     template_pop['upscaler_1'] = config['upscaler_1']
     template_pop['spoiler'] = config['spoiler']
     template_pop['spoiler_role'] = config['spoiler_role']
+    template_pop['live_preview'] = config['live_preview']
     return template_pop
 
 
@@ -508,8 +510,8 @@ def populate_global_vars():
     global_var.prompt_ignore_list = [x for x in config['prompt_ignore_list']]
     global_var.display_ignored_words = config['display_ignored_words']
     global_var.negative_prompt_prefix = [x for x in config['negative_prompt_prefix']]
-    if config['preview_update_interval'] is not None:
-        global_var.preview_update_interval = float(config['preview_update_interval'])
+    if config['live_preview_update_interval'] is not None:
+        global_var.preview_update_interval = float(config['live_preview_update_interval'])
     # slash command doesn't update this dynamically. Changes to size need a restart.
     global_var.size_range = range(512, config['max_size'] + 64, 64)
     if len(global_var.size_range) > 25:

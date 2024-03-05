@@ -19,54 +19,86 @@ from core import settings
 from core import settingscog
 from threading import Thread
 
-async def update_progress(event_loop, status_message_task, s, queue_object, tries, any_job, tries_since_no_job):
+debug_progress = False
+
+
+async def update_progress(event_loop, status_message_task, s, queue_object, tries=0, any_job=False, tries_since_no_progress=0, last_file=None):
     status_message = status_message_task.result()
     try:
         progress_data = s.get(url=f'{settings.global_var.url}/sdapi/v1/progress').json()
         job_name = progress_data.get('state').get('job')
+        if debug_progress:
+            step = progress_data.get("state").get("sampling_step")
+            has_last_file = last_file is not None
+            print(f'Job: {job_name} | Step: {step} | Tries: {tries} | Any Job: {any_job} | Tries Since No Job: {tries_since_no_progress} | Last File: {has_last_file}')
+
         if job_name != '':
             any_job = True
 
-        if progress_data["current_image"] is None:
-            if job_name == '':
-                if any_job:
-                    if tries_since_no_job >= 2:
-                        return
-                    time.sleep(settings.global_var.preview_update_interval)
-                    event_loop.create_task(
-                        update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, tries_since_no_job + 1))
+        if job_name == '':
+            if any_job:
+                if tries_since_no_progress >= 2:
+                    if debug_progress:
+                        print('Exiting progress, no job in last 2 tries')
                     return
-                else:
-                    # escape hatch
-                    if tries > 10:
-                        return
-                    time.sleep(settings.global_var.preview_update_interval)
-                    event_loop.create_task(
-                        update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, tries_since_no_job))
-                    return
-            else:
+
+                if debug_progress:
+                    print(f'No job in try,sleeping for {settings.global_var.preview_update_interval}')
                 time.sleep(settings.global_var.preview_update_interval)
                 event_loop.create_task(
-                    update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, 0))
+                    update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, tries_since_no_progress + 1, last_file))
+                return
+            else:
+                # escape hatch
+                if tries > 10:
+                    if debug_progress:
+                        print('escape hatch exit')
+                    return
+
+                if debug_progress:
+                    print(f'Have not seen a job yet, sleeping for {settings.global_var.preview_update_interval}')
+                time.sleep(settings.global_var.preview_update_interval)
+                event_loop.create_task(
+                    update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, tries_since_no_progress, last_file))
                 return
 
-        image = Image.open(io.BytesIO(base64.b64decode(progress_data["current_image"])))
+        file = None
+        if progress_data["current_image"] is not None:
+            if debug_progress:
+                print('updating progress => Preview image in progress data')
+            image = Image.open(io.BytesIO(base64.b64decode(progress_data["current_image"])))
 
-        with contextlib.ExitStack() as stack:
-            buffer = stack.enter_context(io.BytesIO())
-            image.save(buffer, 'PNG')
-            buffer.seek(0)
-            filename = f'{queue_object.seed}.png'
-            if queue_object.spoiler:
-                filename = f'SPOILER_{queue_object.seed}.png'
-            fp = buffer
-            file = discord.File(fp, filename)
+            with contextlib.ExitStack() as stack:
+                buffer = stack.enter_context(io.BytesIO())
+                image.save(buffer, 'PNG')
+                buffer.seek(0)
+                filename = f'{queue_object.seed}.png'
+                if queue_object.spoiler:
+                    filename = f'SPOILER_{queue_object.seed}.png'
+                fp = buffer
+                file = discord.File(fp, filename)
+                last_file = {
+                    'name': filename,
+                    'buffer': fp
+                }
+        elif last_file is not None:
+            if debug_progress:
+                print('updating progress => No preview image in progress data, but had last_file')
+            last_file['buffer'].seek(0)
+            file = discord.File(last_file['buffer'], last_file['name'])
+        elif debug_progress:
+            print('updating progress => No preview or last_image')
+
         ips = '?'
-        if progress_data["eta_relative"] != 0:                               
+        if progress_data["eta_relative"] != 0:
             ips = round(
                 (int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
 
         view = viewhandler.ProgressView()
+
+        files = []
+        if file is not None:
+            files = [file]
 
         await status_message.edit(
             content=f'**Author**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
@@ -74,13 +106,22 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
                     f'\n{progress_data.get("state").get("sampling_step")}/{queue_object.steps} iterations, '
                     f'~{ips} it/s'
                     f'\n**Relative ETA**: {round(progress_data.get("eta_relative"), 2)} seconds',
-            files=[file], view=view)
+            files=files, view=view)
     except Exception as e:
         print('Something goes wrong...', str(e))
+        if tries_since_no_progress >= 3:
+            print('Exiting progress due too many tries without progress')
+            return
+        time.sleep(settings.global_var.preview_update_interval)
+        event_loop.create_task(
+            update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, tries_since_no_progress + 1, last_file))
+        return
 
-    time.sleep(1)
+    if debug_progress:
+        print(f'sleeping for {settings.global_var.preview_update_interval}')
+    time.sleep(settings.global_var.preview_update_interval)
     event_loop.create_task(
-        update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, 0))
+        update_progress(event_loop, status_message_task, s, queue_object, tries + 1, any_job, 0, last_file))
 
 class StableCog(commands.Cog, name='Stable Diffusion', description='Create images from natural language.'):
     ctx_parse = discord.ApplicationContext
@@ -316,9 +357,12 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
         prompt = settings.extra_net_defaults(prompt, channel)
 
         if data_model != '':
-            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt} -- Spoiler: {derived_spoiler}')
+            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator}'
+                  f' -- Prompt: {prompt} -- Spoiler: {derived_spoiler}')
         else:
-            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator} -- Prompt: {prompt} -- Using model: {data_model} -- Spoiler: {derived_spoiler}')
+            print(f'Request -- {ctx.author.name}#{ctx.author.discriminator}'
+                  f' -- Prompt: {prompt} -- Using model: {data_model} -- Spoiler: {derived_spoiler}')
+
 
         if seed == -1:
             seed = random.randint(0, 0xFFFFFFFF)
@@ -427,21 +471,26 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
         # set up tuple of parameters to pass into the Discord view
         input_tuple = (
-            ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler, seed, strength,
+            ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler,
+            seed, strength,
             init_image, batch, styles, facefix, highres_fix, clip_skip, extra_net, derived_spoiler, epoch_time)
-        
+
         view = viewhandler.DrawView(input_tuple)
         # setup the queue
         user_queue_limit = settings.queue_check(ctx.author)
         if queuehandler.GlobalQueue.dream_thread.is_alive():
             if user_queue_limit == "Stop":
-                await ctx.send_response(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
+                await ctx.send_response(
+                    content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.",
+                    ephemeral=True)
             else:
                 queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(self, *input_tuple, view))
         else:
             await queuehandler.process_dream(self, queuehandler.DrawObject(self, *input_tuple, view))
         if user_queue_limit != "Stop":
-            await ctx.send_response(f'<@{ctx.author.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}`` - ``{simple_prompt}``\nSteps: ``{steps}``{reply_adds}')
+            await ctx.send_response(
+                f'<@{ctx.author.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}``'
+                f' - ``{simple_prompt}``\nSteps: ``{steps}``{reply_adds}')
 
     # the function to queue Discord posts
     def post(self, event_loop: queuehandler.GlobalQueue.post_event_loop, post_queue_object: queuehandler.PostObject):
@@ -459,23 +508,27 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
     def dream(self, event_loop: queuehandler.GlobalQueue.event_loop, queue_object: queuehandler.DrawObject):
         try:
             start_time = time.time()
-            
-            status_message_task = event_loop.create_task(queue_object.ctx.channel.send(
-                f'**Author**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
-                f'**Prompt**: `{queue_object.prompt}`\n**Progress**: Initialization...'
-                f'\n0/{queue_object.steps} iteractions, 0.00 it/s'
-                f'\n**Relative ETA**: Initialization...'))
 
-            def worker():
-                event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object, 0, False, 0))
-                return
+            channel = '% s' % queue_object.ctx.channel.id
+            live_preview = settings.read(channel)['live_preview']
 
-            status_thread = threading.Thread(target=worker)
+            if live_preview:
+                status_message_task = event_loop.create_task(queue_object.ctx.channel.send(
+                    f'**Author**: {queue_object.ctx.author.id} ({queue_object.ctx.author.name})\n'
+                    f'**Prompt**: `{queue_object.prompt}`\n**Progress**: initialization...'
+                    f'\n0/{queue_object.steps} iteractions, 0.00 it/s'
+                    f'\n**Relative ETA**: initialization...'))
 
-            def start_thread(*args):
-                status_thread.start()
+                def worker():
+                    event_loop.create_task(update_progress(event_loop, status_message_task, s, queue_object))
+                    return
 
-            status_message_task.add_done_callback(start_thread)  
+                status_thread = threading.Thread(target=worker)
+
+                def start_thread(*args):
+                    status_thread.start()
+
+                status_message_task.add_done_callback(start_thread)
 
             # construct a payload for data model, then the normal payload
             model_payload = {
@@ -517,7 +570,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                     "enable_hr": True,
                     "hr_upscaler": queue_object.highres_fix,
                     "hr_scale": 1,
-                    "hr_second_pass_steps": int(queue_object.steps)/2,
+                    "hr_second_pass_steps": int(queue_object.steps) / 2,
                     "denoising_strength": queue_object.strength
                 }
                 payload.update(highres_payload)
@@ -579,13 +632,24 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
                 settings.stats_count(queue_object.batch[0]*queue_object.batch[1])
 
-                # set up discord message
-                image_count = len(pil_images)
-                noun_descriptor = "drawing" if image_count == 1 else f'{image_count} drawings'
-                draw_time = '{0:.3f}'.format(end_time - start_time)
-                message = f'my {noun_descriptor} of ``{queue_object.simple_prompt}`` took me ``{draw_time}`` seconds!'
+
+            # set up discord message
+            image_count = len(pil_images)
+            if live_preview:
+                def post_dream():
+                    event_loop.create_task(status_message_task.result().delete())
+                Thread(target=post_dream, daemon=True).start()
+
+            try:
+                user_id = queue_object.ctx.author.id
+            except(Exception,):
+                user_id = queue_object.ctx.user.id
+            noun_descriptor = "drawing" if image_count == 1 else f'{image_count} drawings'
+            draw_time = '{0:.3f}'.format(end_time - start_time)
+            message = f'my {noun_descriptor} of ``{queue_object.simple_prompt}`` took me ``{draw_time}`` seconds!'
 
             view = queue_object.view
+
             # post to discord
             with contextlib.ExitStack() as stack:
                 buffer_handles = [stack.enter_context(io.BytesIO()) for _ in pil_images]
@@ -603,19 +667,6 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
                     self, queuehandler.PostObject(
                         self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>, {message}', file='',
                         files=files, embed='', view=view))
-
-            # set up discord message
-            def post_dream():
-                event_loop.create_task(status_message_task.result().delete())
-            Thread(target=post_dream, daemon=True).start() 
-            
-            content = f'> for {queue_object.ctx.author.name}'
-            noun_descriptor = "drawing" if image_count == 1 else f'{image_count} drawings'
-            draw_time = '{0:.3f}'.format(end_time - start_time)
-            message = f'my {noun_descriptor} of ``{queue_object.simple_prompt}`` took me ``{draw_time}`` seconds!'
-
-            view = queue_object.view
-
         except KeyError as e:
             embed = discord.Embed(title='txt2img failed', description=f'An invalid parameter was found!\n{e}',
                                   color=settings.global_var.embed_color)
@@ -627,7 +678,7 @@ class StableCog(commands.Cog, name='Stable Diffusion', description='Create image
 
         # check each queue for any remaining tasks
         queuehandler.process_queue()
-            
+
 def setup(bot):
     bot.add_cog(StableCog(bot))
 
