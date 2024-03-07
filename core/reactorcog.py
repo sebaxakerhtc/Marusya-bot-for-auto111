@@ -507,6 +507,40 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                     status_thread.start()
 
                 status_message_task.add_done_callback(start_thread)
+                
+            # ReActor arguments:
+            reactorargs=[
+                None, #0
+                True, #1 Enable ReActor
+                '0', #2 Comma separated face number(s) from swap-source image
+                '0', #3 Comma separated face number(s) for target image (result)
+                'inswapper_128.onnx', #4 model path
+                'CodeFormer', #4 Restore Face: None; CodeFormer; GFPGAN
+                1, #5 Restore visibility value
+                True, #7 Restore face -> Upscale
+                None, #8 Upscaler (type 'None' if doesn't need), see full list here: http://127.0.0.1:7860/sdapi/v1/script-info -> reactor -> sec.8
+                1, #9 Upscaler scale value
+                1, #10 Upscaler visibility (if scale = 1)
+                False, #11 Swap in source image
+                True, #12 Swap in generated image
+                1, #13 Console Log Level (0 - min, 1 - med or 2 - max)
+                0, #14 Gender Detection (Source) (0 - No, 1 - Female Only, 2 - Male Only)
+                0, #15 Gender Detection (Target) (0 - No, 1 - Female Only, 2 - Male Only)
+                False, #16 Save the original image(s) made before swapping
+                0.5, #17 CodeFormer Weight (0 = maximum effect, 1 = minimum effect), 0.5 - by default
+                False, #18 Source Image Hash Check, True - by default
+                False, #19 Target Image Hash Check, False - by default
+                "CUDA", #20 CPU or CUDA (if you have it), CPU - by default
+                True, #21 Face Mask Correction
+                1, #22 Select Source, 0 - Image, 1 - Face Model, 2 - Source Folder
+                "Julik2.safetensors", #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
+                "C:\PATH_TO_FACES_IMAGES", #24 The path to the folder containing source faces images, don't forger to set #22 to 2
+                None, #25 skip it for API
+                True, #26 Randomly select an image from the path
+                True, #27 Force Upscale even if no face found
+                0.5, #28 Face Detection Threshold
+                2, #29 Maximum number of faces to detect (0 is unlimited)
+            ]
 
             # construct a payload for data model, then the normal payload
             model_payload = {
@@ -529,7 +563,8 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 "styles": [
                     queue_object.styles
                 ],
-                "restore_faces": False
+                "restore_faces": False,
+                "alwayson_scripts": {"reactor":{"args":reactorargs}}
             }
 
             # update payload if init_img or init_url is used
