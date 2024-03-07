@@ -16,6 +16,7 @@ To generate a prompt from a couple of words, use the /generate command and inclu
 
 ### Currently supported options
 
+- face swap (ReActor) (_[Install it, if you haven't](https://github.com/Gourieff/sd-webui-reactor)_)
 - live preview
 - negative prompts
 - swap model/checkpoint (_[see origial wiki](https://github.com/Kilvoctu/aiyabot/wiki/Model-swapping)_)
