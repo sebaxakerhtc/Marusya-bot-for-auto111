@@ -101,4 +101,6 @@ Marusya only exists thanks to these awesome people:
   - https://github.com/Kilvoctu/aiyabot
 - FoxxMD, for Live preview optimizations
   - https://github.com/FoxxMD
+- Gourieff for ReActor extension
+  - https://github.com/Gourieff/sd-webui-reactor
 - You, for using Marusya and contributing with PRs, bug reports, feedback, and more!  
