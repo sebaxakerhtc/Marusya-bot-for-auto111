@@ -250,6 +250,24 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         description='Mark generated image as spoiler?',
         required=False,
     )
+    @option(
+        'face_model',
+        str,
+        description='Face model name of object for swaping (without .safetensors)',
+        required=False,
+    )
+    @option(
+        'face_no_source',
+        str,
+        description='Comma separated face number(s) from swap-source image',
+        required=False,
+    )
+    @option(
+        'face_no_target',
+        str,
+        description='Comma separated face number(s) for target image (result)',
+        required=False,
+    )
     async def dream_handler(self, ctx: discord.ApplicationContext, *,
                             prompt: str, negative_prompt: str = None,
                             data_model: Optional[str] = None,
@@ -265,7 +283,11 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                             init_image: Optional[discord.Attachment] = None,
                             init_url: Optional[str],
                             batch: Optional[str] = None,
-                            spoiler: Optional[bool] = None):
+                            spoiler: Optional[bool] = None,
+                            face_model: Optional[str] = None,
+                            face_no_source: Optional[str] = "0",
+                            face_no_target: Optional[str] = "0"
+                            ):
 
         # update defaults with any new defaults from settingscog
         channel = '% s' % ctx.channel.id
@@ -450,8 +472,8 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         # set up tuple of parameters to pass into the Discord view
         input_tuple = (
             ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler,
-            seed, strength,
-            init_image, batch, styles, clip_skip, extra_net, derived_spoiler, epoch_time)
+            seed, strength, init_image, batch, styles, clip_skip, extra_net, derived_spoiler,
+            face_model, face_no_source, face_no_target, epoch_time)
 
         view = viewhandler.DrawView(input_tuple)
         # setup the queue
@@ -512,8 +534,8 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
             reactorargs=[
                 None, #0
                 True, #1 Enable ReActor
-                '0', #2 Comma separated face number(s) from swap-source image
-                '0', #3 Comma separated face number(s) for target image (result)
+                queue_object.face_no_source, #2 Comma separated face number(s) from swap-source image
+                queue_object.face_no_target, #3 Comma separated face number(s) for target image (result)
                 'inswapper_128.onnx', #4 model path
                 'CodeFormer', #4 Restore Face: None; CodeFormer; GFPGAN
                 1, #5 Restore visibility value
@@ -528,12 +550,12 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 0, #15 Gender Detection (Target) (0 - No, 1 - Female Only, 2 - Male Only)
                 False, #16 Save the original image(s) made before swapping
                 0.5, #17 CodeFormer Weight (0 = maximum effect, 1 = minimum effect), 0.5 - by default
-                False, #18 Source Image Hash Check, True - by default
+                True, #18 Source Image Hash Check, True - by default
                 False, #19 Target Image Hash Check, False - by default
                 "CUDA", #20 CPU or CUDA (if you have it), CPU - by default
                 True, #21 Face Mask Correction
                 1, #22 Select Source, 0 - Image, 1 - Face Model, 2 - Source Folder
-                "Julik2.safetensors", #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
+                queue_object.face_model + ".safetensors", #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
                 "C:\PATH_TO_FACES_IMAGES", #24 The path to the folder containing source faces images, don't forger to set #22 to 2
                 None, #25 skip it for API
                 True, #26 Randomly select an image from the path
