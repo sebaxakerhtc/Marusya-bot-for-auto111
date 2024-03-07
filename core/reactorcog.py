@@ -224,7 +224,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
     @option(
         'strength',
         str,
-        description='The amount in which init_image will be altered (0.0 to 1.0).'
+        description='The amount in which init_image will be altered (0.0 to 1.0). 0.0 is recomended for face swap only'
     )
     @option(
         'init_image',
@@ -322,8 +322,6 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
             styles = settings.read(channel)['style']
         if clip_skip is None:
             clip_skip = settings.read(channel)['clip_skip']
-        if strength is None:
-            strength = settings.read(channel)['strength']
         if batch is None:
             batch = settings.read(channel)['batch']
         if spoiler is None:
