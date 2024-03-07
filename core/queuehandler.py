@@ -32,6 +32,38 @@ class DrawObject:
         self.view = view
 
 
+# the queue object for txt2image and img2img with ReActor
+class SwapObject:
+    def __init__(self, cog, ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height,
+                 guidance_scale, sampler, seed, strength, init_image, batch, styles, clip_skip, extra_net,
+                 spoiler, face_model, face_no_source, face_no_target, face_image, epoch_time, view):
+        self.cog = cog
+        self.ctx = ctx
+        self.simple_prompt = simple_prompt
+        self.prompt = prompt
+        self.negative_prompt = negative_prompt
+        self.data_model = data_model
+        self.steps = steps
+        self.width = width
+        self.height = height
+        self.guidance_scale = guidance_scale
+        self.sampler = sampler
+        self.seed = seed
+        self.strength = strength
+        self.init_image = init_image
+        self.batch = batch
+        self.styles = styles
+        self.clip_skip = clip_skip
+        self.extra_net = extra_net
+        self.spoiler = spoiler
+        self.face_model = face_model
+        self.face_no_source = face_no_source
+        self.face_no_target = face_no_target
+        self.face_image = face_image
+        self.epoch_time = epoch_time
+        self.view = view
+
+
 # the queue object for extras - upscale
 class UpscaleObject:
     def __init__(self, cog, ctx, resize, init_image, upscaler_1, upscaler_2, upscaler_2_strength, gfpgan, codeformer,
@@ -100,7 +132,7 @@ class GlobalQueue:
 
 
 def process_queue():
-    def start(target_queue: list[DrawObject | UpscaleObject | IdentifyObject | GenerateObject]):
+    def start(target_queue: list[DrawObject | SwapObject | UpscaleObject | IdentifyObject | GenerateObject]):
         queue_object = target_queue.pop(0)
         queue_object.cog.dream(GlobalQueue.event_loop, queue_object)
 
@@ -108,7 +140,7 @@ def process_queue():
         start(GlobalQueue.queue)
 
 
-async def process_dream(self, queue_object: DrawObject | UpscaleObject | IdentifyObject):
+async def process_dream(self, queue_object: DrawObject | SwapObject | UpscaleObject | IdentifyObject):
     GlobalQueue.dream_thread = Thread(target=self.dream, args=(GlobalQueue.event_loop, queue_object))
     GlobalQueue.dream_thread.start()
 

@@ -10,6 +10,7 @@ from core import infocog
 from core import queuehandler
 from core import settings
 from core import stablecog
+from core import reactorcog
 from core import upscalecog
 
 '''
