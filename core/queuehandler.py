@@ -36,7 +36,7 @@ class DrawObject:
 class SwapObject:
     def __init__(self, cog, ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height,
                  guidance_scale, sampler, seed, strength, init_image, batch, styles, clip_skip, extra_net,
-                 spoiler, face_model, face_no_source, face_no_target, epoch_time, view):
+                 spoiler, face_model, face_no_source, face_no_target, face_image, epoch_time, view):
         self.cog = cog
         self.ctx = ctx
         self.simple_prompt = simple_prompt
@@ -59,6 +59,7 @@ class SwapObject:
         self.face_model = face_model
         self.face_no_source = face_no_source
         self.face_no_target = face_no_target
+        self.face_image = face_image
         self.epoch_time = epoch_time
         self.view = view
 

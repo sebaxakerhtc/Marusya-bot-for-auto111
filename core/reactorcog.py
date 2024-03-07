@@ -253,7 +253,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
     @option(
         'face_model',
         str,
-        description='Face model name of object for swaping (without .safetensors)',
+        description='Face model name of object for swaping (without .safetensors). Owerwrites face_url or face_image',
         required=False,
     )
     @option(
@@ -266,6 +266,18 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         'face_no_target',
         str,
         description='Comma separated face number(s) for target image (result)',
+        required=False,
+    )
+    @option(
+        'face_image',
+        discord.Attachment,
+        description='The face image for swaping. If you want - you can set strength value!',
+        required=False,
+    )
+    @option(
+        'face_url',
+        str,
+        description='The starter URL image for generation. This overrides init_face_image!',
         required=False,
     )
     async def dream_handler(self, ctx: discord.ApplicationContext, *,
@@ -286,7 +298,9 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                             spoiler: Optional[bool] = None,
                             face_model: Optional[str] = None,
                             face_no_source: Optional[str] = "0",
-                            face_no_target: Optional[str] = "0"
+                            face_no_target: Optional[str] = "0",
+                            face_image: Optional[discord.Attachment] = None,
+                            face_url: Optional[str]
                             ):
 
         # update defaults with any new defaults from settingscog
@@ -375,6 +389,16 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 init_image = requests.get(init_url)
             except(Exception,):
                 await ctx.send_response('URL image not found!\nI will do my best without it!')
+                
+        if face_url:
+            try:
+                face_image = requests.get(face_url)
+            except(Exception,):
+                await ctx.send_response('URL face image not found!\nI will do my best without it!')
+
+        if face_image is None and face_model is None:
+            await ctx.respond(f"I need a face! Add face_model, face_image or face_url", ephemeral=True)
+            return
 
         # verify values and format aiya initial reply
         reply_adds = ''
@@ -408,8 +432,8 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 float(strength)
                 reply_adds += f'\nStrength: ``{strength}``'
             except(Exception,):
-                reply_adds += f"\nStrength can't be ``{strength}``! Setting to default of `0.75`."
-                strength = 0.75
+                reply_adds += f"\nStrength can't be ``{strength}``! Setting to default of `0.0`."
+                strength = 0.0
             reply_adds += f'\nURL Init Image: ``{init_image.url}``'
         # try to convert batch to usable format
         batch_check = settings.batch_format(batch)
@@ -473,7 +497,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         input_tuple = (
             ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler,
             seed, strength, init_image, batch, styles, clip_skip, extra_net, derived_spoiler,
-            face_model, face_no_source, face_no_target, epoch_time)
+            face_model, face_no_source, face_no_target, face_image, epoch_time)
 
         view = viewhandler.DrawView(input_tuple)
         # setup the queue
@@ -529,10 +553,20 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                     status_thread.start()
 
                 status_message_task.add_done_callback(start_thread)
-                
+
+            # ReActor settings:
+            face_image = None
+            face_model = None
+            if queue_object.face_image is not None:
+                face_image = base64.b64encode(requests.get(queue_object.face_image.url, stream=True).content).decode('utf-8')
+                face_source = 0
+            if queue_object.face_model is not None:
+                face_model = queue_object.face_model + '.safetensors'
+                face_image = None
+                face_source = 1
             # ReActor arguments:
             reactorargs=[
-                None, #0
+                face_image, #0
                 True, #1 Enable ReActor
                 queue_object.face_no_source, #2 Comma separated face number(s) from swap-source image
                 queue_object.face_no_target, #3 Comma separated face number(s) for target image (result)
@@ -554,8 +588,8 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 False, #19 Target Image Hash Check, False - by default
                 "CUDA", #20 CPU or CUDA (if you have it), CPU - by default
                 True, #21 Face Mask Correction
-                1, #22 Select Source, 0 - Image, 1 - Face Model, 2 - Source Folder
-                queue_object.face_model + ".safetensors", #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
+                face_source, #22 Select Source, 0 - Image, 1 - Face Model, 2 - Source Folder
+                face_model, #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
                 "C:\PATH_TO_FACES_IMAGES", #24 The path to the folder containing source faces images, don't forger to set #22 to 2
                 None, #25 skip it for API
                 True, #26 Randomly select an image from the path
