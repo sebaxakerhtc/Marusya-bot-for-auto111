@@ -585,13 +585,13 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 True, #18 Source Image Hash Check, True - by default
                 False, #19 Target Image Hash Check, False - by default
                 "CUDA", #20 CPU or CUDA (if you have it), CPU - by default
-                True, #21 Face Mask Correction
+                False, #21 Face Mask Correction
                 face_source, #22 Select Source, 0 - Image, 1 - Face Model, 2 - Source Folder
                 face_model, #23 Filename of the face model (from "models/reactor/faces"), e.g. elena.safetensors, don't forger to set #22 to 1
-                "C:\PATH_TO_FACES_IMAGES", #24 The path to the folder containing source faces images, don't forger to set #22 to 2
+                None, #24 The path to the folder containing source faces images, don't forger to set #22 to 2
                 None, #25 skip it for API
-                True, #26 Randomly select an image from the path
-                True, #27 Force Upscale even if no face found
+                False, #26 Randomly select an image from the path
+                False, #27 Force Upscale even if no face found
                 0.5, #28 Face Detection Threshold
                 2, #29 Maximum number of faces to detect (0 is unlimited)
             ]
