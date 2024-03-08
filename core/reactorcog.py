@@ -14,7 +14,7 @@ from discord.ext import commands
 from typing import Optional
 
 from core import queuehandler
-from core import viewhandler
+from core import faceviewhandler
 from core import settings
 from core import settingscog
 from threading import Thread
@@ -94,7 +94,7 @@ async def update_progress(event_loop, status_message_task, s, queue_object, trie
             ips = round(
                 (int(queue_object.steps) - progress_data["state"]["sampling_step"]) / progress_data["eta_relative"], 2)
 
-        view = viewhandler.ProgressView()
+        view = faceviewhandler.ProgressView()
 
         files = []
         if file is not None:
@@ -136,7 +136,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.bot.add_view(viewhandler.DrawView(self))
+        self.bot.add_view(faceviewhandler.DrawView(self))
 
     @commands.slash_command(name='swapface', description='Replace the face with ReActor', guild_only=True)
     @option(
@@ -291,7 +291,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                             styles: Optional[str] = None,
                             extra_net: Optional[str] = None,
                             clip_skip: Optional[int] = None,
-                            strength: Optional[str] = None,
+                            strength: Optional[str] = "0.0",
                             init_image: Optional[discord.Attachment] = None,
                             init_url: Optional[str],
                             batch: Optional[str] = None,
@@ -497,7 +497,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
             seed, strength, init_image, batch, styles, clip_skip, extra_net, derived_spoiler,
             face_model, face_no_source, face_no_target, face_image, epoch_time)
 
-        view = viewhandler.DrawView(input_tuple)
+        view = faceviewhandler.DrawView(input_tuple)
         # setup the queue
         user_queue_limit = settings.queue_check(ctx.author)
         if queuehandler.GlobalQueue.dream_thread.is_alive():
@@ -611,7 +611,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 "seed": queue_object.seed,
                 "seed_resize_from_h": -1,
                 "seed_resize_from_w": -1,
-                "denoising_strength": None,
+                "denoising_strength": "0.0",
                 "n_iter": queue_object.batch[0],
                 "batch_size": queue_object.batch[1],
                 "styles": [

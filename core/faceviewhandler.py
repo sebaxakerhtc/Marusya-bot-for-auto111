@@ -9,7 +9,7 @@ from core import ctxmenuhandler
 from core import infocog
 from core import queuehandler
 from core import settings
-from core import stablecog
+from core import reactorcog
 from core import upscalecog
 
 '''
@@ -29,16 +29,17 @@ input_tuple[0] = ctx
 [12] = init_image
 [13] = batch
 [14] = style
-[15] = facefix
-[16] = highres_fix
-[17] = clip_skip
-[18] = extra_net
-[19] = spoiler
-[20] = epoch_time
+[15] = clip_skip
+[16] = extra_net
+[17] = spoiler
+[18] = face_model
+[19] = face_no_source
+[20] = face_no_target
+[21] = epoch_time
 '''
 tuple_names = ['ctx', 'simple_prompt', 'prompt', 'negative_prompt', 'data_model', 'steps', 'width', 'height',
-               'guidance_scale', 'sampler', 'seed', 'strength', 'init_image', 'batch', 'styles', 'facefix',
-               'highres_fix', 'clip_skip', 'extra_net', 'spoiler', 'epoch_time']
+               'guidance_scale', 'sampler', 'seed', 'strength', 'init_image', 'batch', 'styles', 'clip_skip',
+               'extra_net', 'spoiler', 'face_model', 'face_no_source', 'face_no_target', 'epoch_time']
 
 
 # the modal that is used for the 🖋 button
@@ -47,7 +48,7 @@ class DrawModal(Modal):
         super().__init__(title="Change Prompt!")
         self.input_tuple = input_tuple
 
-        # run through mod function to get clean negative since I don't want to add it to stablecog tuple
+        # run through mod function to get clean negative since I don't want to add it to reactorcog tuple
         self.clean_negative = input_tuple[3]
         if settings.global_var.negative_prompt_prefix:
             mod_results = settings.prompt_mod(input_tuple[2], input_tuple[3])
@@ -212,17 +213,9 @@ class DrawModal(Modal):
                     await infocog.InfoView.button_style(infocog_view, '', interaction)
                     return
 
-            if 'facefix:' in line:
-                if line.split(':', 1)[1] in settings.global_var.facefix_models:
-                    pen[15] = line.split(':', 1)[1]
-                else:
-                    invalid_input = True
-                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` can't fix faces! I have suggestions.",
-                                        value=', '.join(['`%s`' % x for x in settings.global_var.facefix_models]),
-                                        inline=False)
             if 'clip_skip:' in line:
                 try:
-                    pen[17] = [x for x in range(1, 14, 1) if x == int(line.split(':', 1)[1])][0]
+                    pen[15] = [x for x in range(1, 14, 1) if x == int(line.split(':', 1)[1])][0]
                 except(Exception,):
                     invalid_input = True
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is too much CLIP to skip!",
@@ -231,15 +224,39 @@ class DrawModal(Modal):
                 if line.count(':') == 2:
                     net_check = re.search(':(.*):', line).group(1)
                     if net_check in settings.global_var.extra_nets:
-                        pen[18] = line.split(':', 1)[1]
+                        pen[16] = line.split(':', 1)[1]
                 elif line.count(':') == 1 and line.split(':', 1)[1] in settings.global_var.extra_nets:
-                    pen[18] = line.split(':', 1)[1]
+                    pen[16] = line.split(':', 1)[1]
                 else:
                     embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is an unknown extra network!",
                                         value="I used the info command for you! Please review the hypernets and LoRAs.")
                     await interaction.response.send_message(embed=embed_err, ephemeral=True)
                     await infocog.InfoView.button_hyper(infocog_view, '', interaction)
                     return
+            if 'face_model:' in line:
+                try:
+                    pen[18] = line.split(':', 1)[1]
+                except(Exception,):
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not found.",
+                                        value='Make sure you enter a number (preferably between 0.0 and 1.0).',
+                                        inline=False)
+            if 'face_no_source:' in line:
+                try:
+                    pen[19] = line.split(':', 1)[1]
+                except(Exception,):
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for face_no_source!.",
+                                        value='Make sure you enter a numbers comma separated.',
+                                        inline=False)
+            if 'face_no_target:' in line:
+                try:
+                    pen[20] = line.split(':', 1)[1]
+                except(Exception,):
+                    invalid_input = True
+                    embed_err.add_field(name=f"`{line.split(':', 1)[1]}` is not valid for face_no_target!.",
+                                        value='Make sure you enter a numbers comma separated.',
+                                        inline=False)
 
         # stop and give a useful message if any extended edit values aren't recognized
         if invalid_input:
@@ -273,7 +290,7 @@ class DrawModal(Modal):
 
             # the updated tuple to send to queue
             prompt_tuple = tuple(pen)
-            draw_dream = stablecog.StableCog(self)
+            draw_dream = reactorcog.ReactorCog(self)
 
             # message additions if anything was changed
             prompt_output = f'\nNew prompt: ``{pen[1]}``'
@@ -287,19 +304,22 @@ class DrawModal(Modal):
                     continue
                 if str(pen[index]) != str(self.input_tuple[index]):
                     prompt_output += f'\nNew {value}: ``{pen[index]}``'
+            if str(pen[16]) != 'None':
+                if str(pen[16]) != str(self.input_tuple[16]) and new_net_multi != net_multi or new_net_multi != net_multi:
+                    prompt_output += f'\nNew extra network: ``{pen[16]}`` (multiplier: ``{new_net_multi}``)'
+                elif str(pen[16]) != str(self.input_tuple[16]):
+                    prompt_output += f'\nNew extra network: ``{pen[16]}``'
             if str(pen[18]) != 'None':
-                if str(pen[18]) != str(self.input_tuple[18]) and new_net_multi != net_multi or new_net_multi != net_multi:
-                    prompt_output += f'\nNew extra network: ``{pen[18]}`` (multiplier: ``{new_net_multi}``)'
-                elif str(pen[18]) != str(self.input_tuple[18]):
-                    prompt_output += f'\nNew extra network: ``{pen[18]}``'
+                if str(pen[18]) != str(self.input_tuple[18]):
+                    prompt_output += f'\nNew face_model: ``{pen[18]}``'
 
             print(f'Redraw -- {interaction.user.name}#{interaction.user.discriminator} -- Prompt: {pen[1]}')
 
             # check queue again, but now we know user is not in queue
             if queuehandler.GlobalQueue.dream_thread.is_alive():
-                queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
+                queuehandler.GlobalQueue.queue.append(queuehandler.SwapObject(reactorcog.ReactorCog(self), *prompt_tuple, DrawView(prompt_tuple)))
             else:
-                await queuehandler.process_dream(draw_dream, queuehandler.DrawObject(stablecog.StableCog(self), *prompt_tuple, DrawView(prompt_tuple)))
+                await queuehandler.process_dream(draw_dream, queuehandler.SwapObject(reactorcog.ReactorCog(self), *prompt_tuple, DrawView(prompt_tuple)))
             await interaction.response.send_message(f'<@{interaction.user.id}>, {settings.messages()}\nQueue: ``{len(queuehandler.GlobalQueue.queue)}``{prompt_output}')
 # view that holds the interrupt button for progress
 class ProgressView(View):
@@ -402,15 +422,15 @@ class DrawView(View):
                 print(f'Reroll -- {interaction.user.name}#{interaction.user.discriminator} -- Prompt: {seed_tuple[1]}')
 
                 # set up the draw dream and do queue code again for lack of a more elegant solution
-                draw_dream = stablecog.StableCog(self)
+                draw_dream = reactorcog.ReactorCog(self)
                 user_queue_limit = settings.queue_check(interaction.user)
                 if queuehandler.GlobalQueue.dream_thread.is_alive():
                     if user_queue_limit == "Stop":
                         await interaction.response.send_message(content=f"Please wait! You're past your queue limit of {settings.global_var.queue_limit}.", ephemeral=True)
                     else:
-                        queuehandler.GlobalQueue.queue.append(queuehandler.DrawObject(stablecog.StableCog(self), *seed_tuple, DrawView(seed_tuple)))
+                        queuehandler.GlobalQueue.queue.append(queuehandler.SwapObject(reactorcog.ReactorCog(self), *seed_tuple, DrawView(seed_tuple)))
                 else:
-                    await queuehandler.process_dream(draw_dream, queuehandler.DrawObject(stablecog.StableCog(self), *seed_tuple, DrawView(seed_tuple)))
+                    await queuehandler.process_dream(draw_dream, queuehandler.SwapObject(reactorcog.ReactorCog(self), *seed_tuple, DrawView(seed_tuple)))
 
                 if user_queue_limit != "Stop":
                     await interaction.response.send_message(
