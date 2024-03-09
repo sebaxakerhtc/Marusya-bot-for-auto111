@@ -22,13 +22,13 @@ class GenerateCog(commands.Cog):
 
     @commands.slash_command(name='generate', description='Generates a prompt from text', guild_only=True)
     @option(
-        'Text',
+        'prompt',
         str,
         description='Your text to produce the prompt.',
         required=True,
     )
     async def generate_handler(self, ctx: discord.ApplicationContext, *,
-                            prompt: Optional[str]):
+                            prompt: str):
 
         # set up the queue
         if queuehandler.GlobalQueue.generate_thread.is_alive():
@@ -61,7 +61,7 @@ class GenerateCog(commands.Cog):
             # post to discord
             queuehandler.process_post(
                 self, queuehandler.PostObject(
-                    self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>', file='', embed=embed, view=None))
+                    self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>', file='', files='', embed=embed, view=None))
 
         except Exception as e:
             embed = discord.Embed(title='Generation failed', description=f'{e}\n{traceback.print_exc()}', color=0x00ff00)
