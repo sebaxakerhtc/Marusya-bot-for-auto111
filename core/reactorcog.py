@@ -280,6 +280,19 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         description='The starter URL image for generation. This overrides init_face_image!',
         required=False,
     )
+    @option(
+        'face_restorer',
+        str,
+        description='Face resorer: Codeformer or GFPGAN',
+        required=False,
+        choices=['CodeFormer', 'GFPGAN']
+    )
+    @option(
+        'codeformer_weight',
+        str,
+        description='CodeFormer weight (0.0 to 1.0).',
+        required=False,
+    )
     async def dream_handler(self, ctx: discord.ApplicationContext, *,
                             prompt: str, negative_prompt: str = None,
                             data_model: Optional[str] = None,
@@ -300,7 +313,9 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                             face_no_source: Optional[str] = "0",
                             face_no_target: Optional[str] = "0",
                             face_image: Optional[discord.Attachment] = None,
-                            face_url: Optional[str]
+                            face_url: Optional[str],
+                            face_restorer: Optional[str] = "CodeFormer",
+                            codeformer_weight: Optional[str] = "0.5"
                             ):
 
         # update defaults with any new defaults from settingscog
@@ -433,6 +448,16 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 reply_adds += f"\nStrength can't be ``{strength}``! Setting to default of `0.0`."
                 strength = 0.0
             reply_adds += f'\nURL Init Image: ``{init_image.url}``'
+        reply_adds += f'\nFace restorer: ``{face_restorer}``'
+        if face_restorer == "CodeFormer":
+            # try to convert string to Web UI-friendly float
+            try:
+                codeformer_weight = codeformer_weight.replace(",", ".")
+                float(codeformer_weight)
+                reply_adds += f'\nCodeFormer weight: ``{codeformer_weight}``'
+            except(Exception,):
+                reply_adds += f"\nCodeFormer weight can't be ``{codeformer_weight}``! Setting to default of `0.5`."
+                codeformer_weight = 0.5
         # try to convert batch to usable format
         batch_check = settings.batch_format(batch)
         batch = list(batch_check)
@@ -495,7 +520,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
         input_tuple = (
             ctx, simple_prompt, prompt, negative_prompt, data_model, steps, width, height, guidance_scale, sampler,
             seed, strength, init_image, batch, styles, clip_skip, extra_net, derived_spoiler,
-            face_model, face_no_source, face_no_target, face_image, epoch_time)
+            face_model, face_no_source, face_no_target, face_image, face_restorer, codeformer_weight, epoch_time)
 
         view = faceviewhandler.DrawView(input_tuple)
         # setup the queue
@@ -569,7 +594,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 queue_object.face_no_source, #2 Comma separated face number(s) from swap-source image
                 queue_object.face_no_target, #3 Comma separated face number(s) for target image (result)
                 'inswapper_128.onnx', #4 model path
-                'CodeFormer', #4 Restore Face: None; CodeFormer; GFPGAN
+                queue_object.face_restorer, #4 Restore Face: None; CodeFormer; GFPGAN
                 1, #5 Restore visibility value
                 True, #7 Restore face -> Upscale
                 None, #8 Upscaler (type 'None' if doesn't need), see full list here: http://127.0.0.1:7860/sdapi/v1/script-info -> reactor -> sec.8
@@ -581,7 +606,7 @@ class ReactorCog(commands.Cog, name='ReActor extension', description='Fast and S
                 0, #14 Gender Detection (Source) (0 - No, 1 - Female Only, 2 - Male Only)
                 0, #15 Gender Detection (Target) (0 - No, 1 - Female Only, 2 - Male Only)
                 False, #16 Save the original image(s) made before swapping
-                0.5, #17 CodeFormer Weight (0 = maximum effect, 1 = minimum effect), 0.5 - by default
+                queue_object.codeformer_weight, #17 CodeFormer Weight (0 = maximum effect, 1 = minimum effect), 0.5 - by default
                 True, #18 Source Image Hash Check, True - by default
                 False, #19 Target Image Hash Check, False - by default
                 "CUDA", #20 CPU or CUDA (if you have it), CPU - by default
