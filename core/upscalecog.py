@@ -216,6 +216,8 @@ class UpscaleCog(commands.Cog):
                     message = f'my upscale of ``{queue_object.resize}``x took me ``{draw_time}`` seconds!'
                     file = discord.File(fp=buffer, filename=f'{self.file_name[0:120]}-{queue_object.resize}.png')
 
+                    user_id, user_name = settings.fuzzy_get_id_name(queue_object.ctx)
+
                     queuehandler.process_post(
                         self, queuehandler.PostObject(
                             self, queue_object.ctx, content=f'<@{queue_object.ctx.author.id}>, {message}', files='', file=file, embed='', view=queue_object.view))
